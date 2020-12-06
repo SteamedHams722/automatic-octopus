@@ -30,9 +30,3 @@ def track_ids():
     tracks = list(dict.fromkeys(tracks))
 
     return tracks
-
-test = track_ids()
-
-
-
-

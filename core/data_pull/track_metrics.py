@@ -16,7 +16,3 @@ def features():
     track_features = client_scope.audio_features(tracks)
 
     return track_features
-
-test = features()
-
-print(test)
