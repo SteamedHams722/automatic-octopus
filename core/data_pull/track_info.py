@@ -1,25 +1,23 @@
 # Import necessary libraries
 import spotipy
 from spotipy.oauth2 import SpotifyOAuth
+import sys
+from connections import oauth
 
 # Function to be called in other files
 def recently_played():
     """Return the recently played tracks API data"""
-
     # Set-up authorization scope. This is needed since it accesses user data
     scope = 'user-read-recently-played'
-    sp = spotipy.Spotify(auth_manager=SpotifyOAuth(scope=scope))
+    auth_scope = oauth(scope=scope)
 
-    # Pull in API data
-    # No need to worry about before/after since that is better handled within SQL
-    results = sp.current_user_recently_played(limit=50, after=None, before=None)
+    # Pull in API data. No need to worry about before/after since that is better handled within SQL
+    results = auth_scope.current_user_recently_played(limit=50, after=None, before=None)
 
     return results
 
 def track_ids():
     """Gets the track IDs for the recently played tracks"""
-
-    #Get the json object from the previous function
     results = recently_played()
 
     #Loop through each dictionary in the items list to get the track IDs
@@ -32,6 +30,8 @@ def track_ids():
     tracks = list(dict.fromkeys(tracks))
 
     return tracks
+
+test = track_ids()
 
 
 
