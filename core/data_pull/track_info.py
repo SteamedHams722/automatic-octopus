@@ -1,4 +1,5 @@
 # Import necessary libraries
+import simplejson as json
 import spotipy
 from spotipy.oauth2 import SpotifyOAuth
 import sys
@@ -13,12 +14,13 @@ def recently_played():
 
     # Pull in API data. No need to worry about before/after since that is better handled within SQL
     results = auth_scope.current_user_recently_played(limit=50, after=None, before=None)
+    info_json = json.dumps(recently_played(), indent=2)
 
-    return results
+    return results, info_json
 
 def track_ids():
     """Gets the track IDs for the recently played tracks"""
-    results = recently_played()
+    results, _ = recently_played()
 
     #Loop through each dictionary in the items list to get the track IDs
     tracks = []
