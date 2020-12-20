@@ -1,9 +1,8 @@
 # Import necessary libraries
 import simplejson as json
 import spotipy
-from spotipy.oauth2 import SpotifyOAuth
 import sys
-from connections import oauth
+from connections import oauth, client
 
 # Function to be called in other files
 def recently_played():
@@ -32,3 +31,12 @@ def track_ids():
     tracks = list(dict.fromkeys(tracks))
 
     return tracks
+
+def track_features():
+    """Return high level features on each recently played track"""
+    tracks = track_ids()
+    client_scope = client()
+    track_features = client_scope.audio_features(tracks)
+    features_json = json.dumps(track_features, indent=2)
+
+    return features_json
