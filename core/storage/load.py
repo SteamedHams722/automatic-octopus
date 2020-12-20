@@ -1,1 +1,0 @@
-# Code for pushing the json API data to the postgres database
