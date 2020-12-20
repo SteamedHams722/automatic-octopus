@@ -7,43 +7,34 @@ import sys
 import os
 user_home = os.path.expanduser("~").replace(os.sep,'/')
 sys.path.append(user_home + r"/automaton/core/data_pull")
-from track_info import recently_played #pylint: disable=import-error
-from track_metrics import features #pylint: disable=import-error
+from tracks import track_features, recently_played #pylint: disable=import-error
 from postgres_connections import pg_conn
-from psycopg2 import ProgrammingError
+from psycopg2 import ProgrammingError, sql
 
 # Establish the necessary variables
-db = "raw"
-schema = "spotify"
-column = "src"
-column_type = "json"
-info_json = json.dumps(recently_played(), indent=2)
-metrics_json = json.dumps(features(), indent=2)
 tables = ["track_info", "track_metrics"]
+_, info = recently_played()
+features = track_features()
 
 # Open a cursor for the insert statements
 conn = pg_conn()
 cursor = conn.cursor()
 
-#Top level try block for closing connection and cursor
-try:
-# Loop through the table list to insert the data into the postgres tables
+try: #Top level try block for closing connection and cursor
     try:
-        for table in tables:
+        # Loop through each table in the list to insert the data. Also creates 
+        # the table if it doesn't exist.
+       for table in tables:
+            cursor.execute(
+                f'''CREATE TABLE IF NOT EXISTS spotify.{table} (src jsonb);'''
+            )
+            #TODO: Find a better way to do this so a hardcoded if is not allowed. ALso,
+            # investigate why using the parameterization causes a syntax error
             if table == "track_info":
-                cursor.execute('''
-                    CREATE TABLE IF NOT EXISTS %s.%s.%s (%s %s)''',
-                    (db, schema, table, column, column_type)
-                    )
-                cursor.execute(
-                    '''INSERT INTO %s.%s.%s (%s) \nVALUES %s;''', 
-                    (db, schema, table, column, info_json)
-                    )
-                cursor.commit()
-            # elif table == "track_metrics":
-            #     cursor.execute(f"CREATE TABLE IF NOT EXISTS {schema_table} ({column} {column_type})")
-            #     cursor.execute("INSERT INTO " + schema_table + "(" + column + ")" "VALUES(%s);", (metrics))
-            #     cursor.commit()
+                cursor.execute('''INSERT INTO spotify.track_info (src) VALUES (%s)''', (info))
+            elif table == "track_metrics":
+                cursor.execute('''INSERT INTO spotify.track_metrics (src) VALUES (%s)''', (features))
+            conn.commit()
     except ProgrammingError as err:
         print(f"Unable to insert data into postgres. Message: {err}")
 finally:
