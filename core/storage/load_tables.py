@@ -16,8 +16,8 @@ from psycopg2 import ProgrammingError, errors
 # Establish the necessary variables
 db = "raw"
 schema = "spotify"
-info_data = 'Homer' #Temp until I can get the spotify data working
-feature_data = 'Burnsie' #Temp until I can get the spotify data working
+info_data = r'{"Homer": {"Intelligence":"Dumb", "Weight":"Fat", "Age":"Young"}}' #Temp until I can get the spotify data working
+feature_data = r'{"Homer": {"Jobs":["Astronaut", "Garbage Guy", "Bodyguard"]}}'
 table_data = {"track_info": info_data, "track_metrics": feature_data}
 
 # Set-up logging
@@ -30,7 +30,7 @@ cursor = conn.cursor()
 try: #Top level try block for closing connection and cursor
     timestamp = datetime.utcnow().replace(microsecond=0)
     message = f"{timestamp} Postgres data load initiated."
-    logging.exception(message)
+    logging.info(message)
 
     # Open up the SQL cursor so the commands can be executed
     with cursor:
@@ -40,44 +40,48 @@ try: #Top level try block for closing connection and cursor
             create_schema = "create schema if not exists {0};".format(schema)
             cursor.execute(create_schema)
             conn.commit()
-        except (ProgrammingError, errors.InFailedSqlTransaction) as err:
+        except (ProgrammingError, errors.InFailedSqlTransaction, errors.SyntaxEror) as err:
             timestamp = datetime.utcnow().replace(microsecond=0)
             error = f"{timestamp} ERROR: There was an issue creating the {schema} schema. Message: {err}"
             logging.exception(message)
         else:
             timestamp = datetime.utcnow().replace(microsecond=0)
             message = f"{timestamp} SUCCESS: The {schema} schema is in the {db} database."
-            logging.exception(message)
+            logging.info(message)
 
             # Loop through each dictionary entry to insert the data. Also creates 
             # the table if it doesn't exist.
         for table, data in table_data.items():
             try:
-                create_table = "create table if not exists {0}.{1}.{2} (src varchar(50));".format(db, schema, table)
+                create_table = '''create table if not exists {0}.{1}.{2} ( 
+                    id serial not null primary key,
+                    src json not null
+                    );'''.format(db, schema, table)
                 cursor.execute(create_table)
                 conn.commit()
-            except (ProgrammingError, errors.InFailedSqlTransaction) as err:
+            except (ProgrammingError, errors.InFailedSqlTransaction, errors.SyntaxEror) as err:
                 timestamp = datetime.utcnow().replace(microsecond=0)
                 error = f"{timestamp} ERROR: There was an issue creating the {table} table. Message: {err}"
                 logging.exception(message)
             else:
                 timestamp = datetime.utcnow().replace(microsecond=0)
                 message = f"{timestamp} SUCCESS: The {table} table is in the {schema} schema."
-                logging.exception(message)
+                logging.info(message)
             
             try:
-                insert_data = "insert into {0}.{1}.{2} values ('{3}');".format(db, schema, table, data)
+                insert_data = '''insert into {0}.{1}.{2} (src) 
+                    values ('{3}');'''.format(db, schema, table, data)
                 cursor.execute(insert_data)
                 conn.commit()
-            except (ProgrammingError, errors.InFailedSqlTransaction) as err:
+            except (ProgrammingError, errors.InFailedSqlTransaction, errors.SyntaxEror) as err:
                 message = f"Unable to insert data into the {table} table. Message: {err}"
                 logging.exception(message)
             else:
                 timestamp = datetime.utcnow().replace(microsecond=0)
                 message = f"{timestamp} SUCCESS: Data was inserted into the {table} table."
-                logging.exception(message)
+                logging.info(message)
 finally:
     conn.close()
     timestamp = datetime.utcnow().replace(microsecond=0)
-    message = f"{timestamp} Postgres data load completed. Connection closed."
-    logging.exception(message)
+    message = f"{timestamp} Connection closed."
+    logging.info(message)
