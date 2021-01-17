@@ -1,7 +1,5 @@
 # Import necessary libraries
 import simplejson as json
-import spotipy
-import sys
 from connections import oauth, client
 
 # Function to be called in other files
@@ -13,7 +11,7 @@ def recently_played():
 
     # Pull in API data. No need to worry about before/after since that is better handled within SQL
     results = auth_scope.current_user_recently_played(limit=50, after=None, before=None)
-    info_json = json.dumps(recently_played(), indent=2)
+    info_json = json.dumps(results, indent=2)
 
     return results, info_json
 
