@@ -18,22 +18,31 @@ def oauth(scope):
     token as needed.'''
     #Get the base authentication connection
     sp_oauth = SpotifyOAuth(scope=scope)
-    oauth_conn = spotipy.Spotify(auth_manager=sp_oauth)
 
     #Set-up a token refresh so users don't have to log in constantly
     token_info = sp_oauth.get_cached_token() 
-    if not token_info:
+    if token_info:
+        token = token_info['access_token']
+    else:
         auth_url = sp_oauth.get_authorize_url()
         print(auth_url)
         response = input('Paste the above link into your browser, then paste the redirect url here: ')
 
         code = sp_oauth.parse_response_code(response)
         token_info = sp_oauth.get_access_token(code)
-
         token = token_info['access_token']
+        
+    sp = spotipy.Spotify(auth=token)
 
-    return oauth_conn, token
+    # Refresh the access token if it is expired
+    if sp_oauth.is_token_expired(token_info):
+        token_info = sp_oauth.refresh_access_token(token_info['refresh_token'])
+        token = token_info['access_token']
+        auth_token = spotipy.Spotify(auth=token)
+    else:
+        auth_token = sp
+    
+    return auth_token
 
-conn, token = oauth(scope='user-read-recently-played')
 
-print(token)
+
