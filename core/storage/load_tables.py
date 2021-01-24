@@ -22,9 +22,6 @@ features_json = track_features()
 features_data = features_json.replace("'","''")
 table_data = {"track_info": info_data, "track_features": features_data}
 
-# Set-up logging
-logging.basicConfig(filename='load.log', filemode='a', level=logging.DEBUG)
-
 # Open a cursor for the insert statements
 conn = pg_conn()
 cursor = conn.cursor()
@@ -45,7 +42,7 @@ try: #Top level try block for closing connection and cursor
         except (ProgrammingError, errors.InFailedSqlTransaction, errors.SyntaxError) as err:
             timestamp = datetime.utcnow().replace(microsecond=0)
             error = f"{timestamp} ERROR: There was an issue creating the {schema} schema. Message: {err}"
-            logging.exception(message)
+            logging.exception(error)
         else:
             timestamp = datetime.utcnow().replace(microsecond=0)
             message = f"{timestamp} SUCCESS: The {schema} schema is in the {db} database."
@@ -65,7 +62,7 @@ try: #Top level try block for closing connection and cursor
             except (ProgrammingError, errors.InFailedSqlTransaction, errors.SyntaxError) as err:
                 timestamp = datetime.utcnow().replace(microsecond=0)
                 error = f"{timestamp} ERROR: There was an issue creating the {table} table. Message: {err}"
-                logging.exception(message)
+                logging.exception(error)
             else:
                 timestamp = datetime.utcnow().replace(microsecond=0)
                 message = f"{timestamp} SUCCESS: The {table} table is in the {schema} schema."
@@ -78,8 +75,9 @@ try: #Top level try block for closing connection and cursor
                 cursor.execute(insert_data)
                 conn.commit()
             except (ProgrammingError, errors.InFailedSqlTransaction, errors.SyntaxError) as err:
-                message = f"Unable to insert data into the {table} table. Message: {err}"
-                logging.exception(message)
+                timestamp = datetime.utcnow().replace(microsecond=0)
+                error = f"{timestamp} ERROR:Unable to insert data into the {table} table. Message: {err}"
+                logging.exception(error)
             else:
                 timestamp = datetime.utcnow().replace(microsecond=0)
                 message = f"{timestamp} SUCCESS: Data was inserted into the {table} table."
