@@ -10,14 +10,13 @@ from spotipy.exceptions import SpotifyException #Will need this for exception ha
 # Set up OAuth function
 def oauth(scope, auth_manager=SpotifyOAuth):
     '''Return the OAuth information needed to access user data'''
-    oauth_conn = spotipy.Spotify(auth_manager=SpotifyOAuth(scope=scope))
+    oauth_conn = spotipy.Spotify(auth_manager=auth_manager(scope=scope))
 
     return oauth_conn
 
 def client(auth_manager=SpotifyClientCredentials):
     '''Return the client credentials needed to access non-user data'''
-    auth_manager = SpotifyClientCredentials()
-    client_conn = spotipy.Spotify(auth_manager=auth_manager)
+    client_conn = spotipy.Spotify(auth_manager=auth_manager())
 
     return client_conn
 

@@ -1,8 +1,6 @@
 # Import necessary libraries
-import spotipy
-from spotipy.oauth2 import SpotifyOAuth
-import sys
-from connections import oauth
+import simplejson as json
+from connections import oauth, client
 
 # Function to be called in other files
 def recently_played():
@@ -13,12 +11,13 @@ def recently_played():
 
     # Pull in API data. No need to worry about before/after since that is better handled within SQL
     results = auth_scope.current_user_recently_played(limit=50, after=None, before=None)
+    info_json = json.dumps(results, indent=2)
 
-    return results
+    return results, info_json
 
 def track_ids():
     """Gets the track IDs for the recently played tracks"""
-    results = recently_played()
+    results, _ = recently_played()
 
     #Loop through each dictionary in the items list to get the track IDs
     tracks = []
@@ -30,3 +29,12 @@ def track_ids():
     tracks = list(dict.fromkeys(tracks))
 
     return tracks
+
+def track_features():
+    """Return high level features on each recently played track"""
+    tracks = track_ids()
+    client_scope = client()
+    track_features = client_scope.audio_features(tracks)
+    features_json = json.dumps(track_features, indent=2)
+
+    return features_json
