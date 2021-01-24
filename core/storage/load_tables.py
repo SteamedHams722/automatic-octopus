@@ -46,6 +46,7 @@ def extract_load():
             except (ProgrammingError, errors.InFailedSqlTransaction, errors.SyntaxError) as err:
                 timestamp = datetime.utcnow().replace(microsecond=0)
                 error = f"{timestamp} ERROR: There was an issue creating the {schema} schema. Message: {err}"
+                success = False #This will be used to determine what text message to send
                 logging.exception(error)
             else:
                 timestamp = datetime.utcnow().replace(microsecond=0)
@@ -66,6 +67,7 @@ def extract_load():
                 except (ProgrammingError, errors.InFailedSqlTransaction, errors.SyntaxError) as err:
                     timestamp = datetime.utcnow().replace(microsecond=0)
                     error = f"{timestamp} ERROR: There was an issue creating the {table} table. Message: {err}"
+                    success = False
                     logging.exception(error)
                 else:
                     timestamp = datetime.utcnow().replace(microsecond=0)
@@ -81,13 +83,17 @@ def extract_load():
                 except (ProgrammingError, errors.InFailedSqlTransaction, errors.SyntaxError) as err:
                     timestamp = datetime.utcnow().replace(microsecond=0)
                     error = f"{timestamp} ERROR:Unable to insert data into the {table} table. Message: {err}"
+                    success = False
                     logging.exception(error)
                 else:
                     timestamp = datetime.utcnow().replace(microsecond=0)
                     message = f"{timestamp} SUCCESS: Data was inserted into the {table} table."
+                    success = True #This will be used for the text message
                     logging.info(message)
     finally:
         conn.close()
         timestamp = datetime.utcnow().replace(microsecond=0)
         message = f"{timestamp} Connection closed."
         logging.info(message)
+        
+    return success
