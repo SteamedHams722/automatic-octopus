@@ -8,7 +8,7 @@ import os
 import logging
 from datetime import datetime
 user_home = os.path.expanduser("~").replace(os.sep,'/')
-sys.path.append(user_home + r"/automaton/core/data_pull")
+sys.path.append(user_home + r"/automatic-octopus/core/data_pull")
 from tracks import track_features, recently_played#pylint: disable=import-error
 from postgres_connections import pg_conn
 from psycopg2 import ProgrammingError, errors
