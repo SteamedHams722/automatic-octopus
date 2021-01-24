@@ -1,16 +1,16 @@
 # Import necessary libraries
 import simplejson as json
-from connections import oauth, client
+from connections import client, oauth
 
 # Function to be called in other files
 def recently_played():
     """Return the recently played tracks API data"""
     # Set-up authorization scope. This is needed since it accesses user data
     scope = 'user-read-recently-played'
-    auth_scope = oauth(scope=scope)
+    auth_token = oauth(scope=scope)
 
     # Pull in API data. No need to worry about before/after since that is better handled within SQL
-    results = auth_scope.current_user_recently_played(limit=50, after=None, before=None)
+    results = auth_token.current_user_recently_played(limit=50, after=None, before=None)
     info_json = json.dumps(results, indent=2)
 
     return results, info_json
