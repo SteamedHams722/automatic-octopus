@@ -1,3 +1,4 @@
+#!/usr/bin/env python3
 #This script will pull the API data and load the tables. Eventually, a message
 #should be added that provides updates if the run fails
 
