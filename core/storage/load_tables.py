@@ -37,7 +37,6 @@ def extract_load():
 
         # Open up the SQL cursor so the commands can be executed
         with cursor:
-
             #Create the schema if it doesn't exist
             try:
                 create_schema = "create schema if not exists {0};".format(schema)
