@@ -1,4 +1,5 @@
 #pylint: disable=no-member
+
 '''Use this script to load the track_info and track_metrics tables in the raw 
 database'''
 
@@ -13,7 +14,10 @@ from tracks import track_features, recently_played#pylint: disable=import-error
 from postgres_connections import pg_conn
 from psycopg2 import ProgrammingError, errors
 
-def extract_load():
+# Set-up logging
+logging.basicConfig(filename='execute.log', filemode='a', level='INFO')
+
+def tracks_to_pg():
     '''This function loads the track features and track info data to their 
     respective tables in postgres. If the tables don't exist, it creates them'''
 
@@ -37,7 +41,6 @@ def extract_load():
 
         # Open up the SQL cursor so the commands can be executed
         with cursor:
-
             #Create the schema if it doesn't exist
             try:
                 create_schema = "create schema if not exists {0};".format(schema)
@@ -83,12 +86,12 @@ def extract_load():
                 except (ProgrammingError, errors.InFailedSqlTransaction, errors.SyntaxError) as err:
                     timestamp = datetime.utcnow().replace(microsecond=0)
                     error = f"{timestamp} ERROR:Unable to insert data into the {table} table. Message: {err}"
-                    success = False
+                    success = False  #This will be used for the text message
                     logging.exception(error)
                 else:
                     timestamp = datetime.utcnow().replace(microsecond=0)
                     message = f"{timestamp} SUCCESS: Data was inserted into the {table} table."
-                    success = True #This will be used for the text message
+                    success = True
                     logging.info(message)
     finally:
         conn.close()
