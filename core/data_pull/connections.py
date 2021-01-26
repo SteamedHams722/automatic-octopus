@@ -6,7 +6,7 @@ from datetime import datetime
 import logging
 from urllib3.exceptions import NewConnectionError, MaxRetryError, ConnectTimeoutError
 import spotipy
-from spotipy.oauth2 import SpotifyOAuth, SpotifyClientCredentials
+from spotipy.oauth2 import SpotifyOAuth, SpotifyClientCredentials, SpotifyOauthError
 
 #Set up client credentials needed for basic info
 def client():
@@ -45,7 +45,7 @@ def oauth(scope):
             token = token_info['access_token']
 
         sp = spotipy.Spotify(auth=token)
-    except (MaxRetryError, NewConnectionError, ConnectTimeoutError) as err:
+    except (MaxRetryError, NewConnectionError, ConnectTimeoutError, SpotifyOauthError) as err:
         timestamp = datetime.utcnow().replace(microsecond=0)
         error = f" {timestamp} ERROR: There was an issue acquiring the access token. Message: {err}"
         logging.exception(error)
@@ -62,7 +62,7 @@ def oauth(scope):
             auth_token = spotipy.Spotify(auth=token)
         else:
             auth_token = sp
-    except (MaxRetryError, NewConnectionError, ConnectTimeoutError) as err:
+    except (MaxRetryError, NewConnectionError, ConnectTimeoutError, SpotifyOauthError) as err:
         timestamp = datetime.utcnow().replace(microsecond=0)
         error = f" {timestamp} ERROR: There was an issue refreshing the access token. Message: {err}"
         logging.exception(error)
