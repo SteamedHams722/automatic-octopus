@@ -15,7 +15,7 @@ from email.mime.multipart import MIMEMultipart #Needed for sending text from an 
 from email.mime.text import MIMEText #Needed for sending the text from an email
 
 # Craft a message to the user based on the results and accuracy
-def communicado(success):
+def communicado(success=False):
 
     #Craft the body message based on the above variables
     if success: #Is the job successful?
