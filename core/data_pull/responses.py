@@ -50,7 +50,7 @@ def fetch_data(sheet_name):
         logging.exception(error)
     else:
         timestamp = datetime.utcnow().replace(microsecond=0)
-        message = f"{timestamp} Success: Data written to CSV file"
+        message = f"{timestamp} SUCCESS: Data written to CSV file"
         logging.info(message)
     
     return target_csv
