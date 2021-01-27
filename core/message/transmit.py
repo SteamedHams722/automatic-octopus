@@ -39,27 +39,33 @@ def communicado(success=False):
     port = 587
     server = smtplib.SMTP(smtp, port)
 
-    #Start the email server and login
-    server.connect(smtp, port)
-    server.ehlo()
-    server.starttls()
-    server.ehlo()
-    server.login(sender_email, sender_pass)
+    # If the success value is True, do nothing. Otherwise, send a text message.
+    if success:
+        pass
+    else:
+        # Connect to the server and close once the message is sent
+        try:
+            print("Opening connection to server")
 
-    # Structure the message using MIME
-    message = MIMEMultipart()
-    message['From'] = sender_email
-    message['To'] = recipient_address
-    message['Subject'] = 'API Status\n' # Need to figure out how to strip the forward and back slashes
-    body = results
-    message.attach(MIMEText(body, 'plain'))
+            # Start the email server and login
+            server.connect(smtp, port)
+            server.ehlo()
+            server.starttls()
+            server.ehlo()
+            server.login(sender_email, sender_pass)
 
-    #Convert the message into text, send it, and close the server
-    text_message = message.as_string()
-    server.sendmail(sender_email, recipient_address, text_message)
-    server.quit()
+            # Structure the message using MIME
+            message = MIMEMultipart()
+            message['From'] = sender_email
+            message['To'] = recipient_address
+            message['Subject'] = 'API Status\n' # Need to figure out how to strip the forward and back slashes
+            body = results
+            message.attach(MIMEText(body, 'plain'))
 
-
-    
-
+            # Send the text message
+            text_message = message.as_string()
+            server.sendmail(sender_email, recipient_address, text_message)
+        finally:
+            server.quit()
+            print("Server connection closed")
 
