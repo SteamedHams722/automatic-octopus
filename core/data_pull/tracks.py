@@ -4,7 +4,7 @@ import simplejson as json
 from datetime import datetime
 from connections import client, oauth
 
-# # Set-up logging
+# Set-up logging
 logging.basicConfig(filename='execute.log', filemode='a', level='INFO')
 
 # Function to be called in other files

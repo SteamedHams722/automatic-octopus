@@ -8,6 +8,9 @@ from urllib3.exceptions import NewConnectionError, MaxRetryError, ConnectTimeout
 import spotipy
 from spotipy.oauth2 import SpotifyOAuth, SpotifyClientCredentials, SpotifyOauthError
 
+# Set-up logging
+logging.basicConfig(filename='execute.log', filemode='a', level='INFO')
+
 #Set up client credentials needed for basic info
 def client():
     '''Return the client credentials needed to access non-user data'''
