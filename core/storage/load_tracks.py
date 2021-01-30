@@ -22,7 +22,7 @@ def tracks_to_pg():
     respective tables in postgres. If the tables don't exist, it creates them'''
 
 # Establish the necessary variables
-    db = "raw"
+    db = "nucleus"
     schema = "spotify"
     _, info_json = recently_played()
     info_data = info_json.replace("'","''") #Have to escape single quotes in a postgres friendly way
