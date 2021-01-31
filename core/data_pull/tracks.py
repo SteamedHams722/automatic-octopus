@@ -89,6 +89,7 @@ def track_features():
 def track_analysis():
   """Return granular analysis on each recently played track"""
   tracks = track_ids()
+  client_scope = client()
 
   # Iterate through each track because audio analysis doesn't accept a list of track IDs
   analysis_json = []
@@ -96,10 +97,8 @@ def track_analysis():
     #if track == '62HyVeSK4fpxjKj6dsI5MP': #Use this ID for testing
       #Pull the API data into a dictionary
     try:
-      client_scope = client()
-      track_analysis = client_scope.audio_analysis(track)
-
       #Add the track ID so it can be used for joining to other track information
+      track_analysis = client_scope.audio_analysis(track)
       track_analysis['track']['id'] = track
       
       #Remove all the unnecessary string data
