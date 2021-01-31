@@ -32,5 +32,5 @@ if track_success is False or response_success is False:
     logging.info(message)
 else:
     timestamp = datetime.utcnow().replace(microsecond=0)
-    message = f" {timestamp} No message sent. Both jobs succeeded."
+    message = f" {timestamp} No message sent. Data load jobs succeeded."
     logging.info(message)
