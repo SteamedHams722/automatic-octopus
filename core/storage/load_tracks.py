@@ -58,8 +58,8 @@ def tracks_to_pg():
           message = f"{timestamp} SUCCESS: The {schema} schema is in the {db} database."
           logging.info(message)
 
-          # Loop through each dictionary entry to insert the data. Also creates 
-          # the table if it doesn't exist.
+      # Loop through each dictionary entry to insert the data. Also creates 
+      # the table if it doesn't exist.
       for table, data in table_data.items():
         try:
           create_table = '''create table if not exists {0}.{1}.{2} ( 
@@ -109,7 +109,6 @@ def analysis_to_pg():
   # Establish the necessary variables
   analysis_data  = track_analysis()
   table = 'track_analysis'
-
 
   # Open a cursor for the insert statements
   conn = pg_conn()
@@ -173,6 +172,10 @@ def analysis_to_pg():
                 message = f"{timestamp} SUCCESS: Data was inserted into the {table} table."
                 success = True
                 logging.info(message)
+                
+              # Terminate the for loop early if the success is False
+              if success is False:
+                break
   finally:
     conn.close()
     timestamp = datetime.utcnow().replace(microsecond=0)
