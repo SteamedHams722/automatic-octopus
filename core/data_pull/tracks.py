@@ -91,14 +91,22 @@ def track_analysis():
   tracks = track_ids()
 
   # Iterate through each track because audio analysis doesn't accept a list of track IDs
-  api_list = []
+  analysis_json = []
   for track in tracks:
-    
-    #Pull the API data into a dictionary
+    #if track == '62HyVeSK4fpxjKj6dsI5MP': #Use this ID for testing
+      #Pull the API data into a dictionary
     try:
       client_scope = client()
       track_analysis = client_scope.audio_analysis(track)
-      api_list.append(track_analysis)
+
+      #Add the track ID so it can be used for joining to other track information
+      track_analysis['track']['id'] = track
+      
+      #Remove all the unnecessary string data
+      track_analysis['track'].pop('codestring', None)
+      track_analysis['track'].pop('rhythmstring', None)
+      track_analysis['track'].pop('synchstring', None)
+      track_analysis['track'].pop('echoprintstring', None)
     except Exception as err: #TODO: Need to figure out specific exceptions here
       timestamp = datetime.utcnow().replace(microsecond=0)
       error = f"{timestamp} ERROR: Issue gathering audio analysis data. Message: {err}"
@@ -110,7 +118,8 @@ def track_analysis():
 
         #Create a json object from the API list
       try:
-        analysis_json = json.dumps(api_list, indent=2)
+        single_json = json.dumps(track_analysis, indent=2)
+        analysis_json.append(single_json)
       except ValueError as err:
         timestamp = datetime.utcnow().replace(microsecond=0)
         error = f"{timestamp} ERROR: Issue converting audio analysis data to JSON. Message: {err}"
@@ -119,5 +128,7 @@ def track_analysis():
         timestamp = datetime.utcnow().replace(microsecond=0)
         message = f"{timestamp} SUCCESS: Converted audio analysis data to JSON."
         logging.info(message)
-  
+    
   return analysis_json
+
+#print(track_analysis())
