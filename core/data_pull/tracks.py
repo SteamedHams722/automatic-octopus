@@ -1,6 +1,6 @@
 # Import necessary libraries
 import logging
-import simplejson as json
+import json
 from datetime import datetime
 from connections import client, oauth
 
@@ -24,7 +24,9 @@ def recently_played():
   else:
     timestamp = datetime.utcnow().replace(microsecond=0)
     message = f"{timestamp} SUCCESS: Gathered recently played data."
-    logging.info(message) 
+    logging.info(message)
+
+    # Convert the dictionary to a json object
     try:
       info_json = json.dumps(results, indent=2)
     except ValueError as err:
@@ -57,6 +59,7 @@ def track_features():
   """Return high level features on each recently played track"""
   tracks = track_ids()
 
+  #Pull the SPI into a dictionary
   try:
     client_scope = client()
     features = client_scope.audio_features(tracks)
@@ -68,6 +71,8 @@ def track_features():
     timestamp = datetime.utcnow().replace(microsecond=0)
     message = f"{timestamp} SUCCESS: Gathered track features data."
     logging.info(message) 
+
+    #Create a json object from the dictionary
     try:
       features_json = json.dumps(features, indent=2)
     except ValueError as err:
@@ -86,13 +91,14 @@ def track_analysis():
   tracks = track_ids()
 
   # Iterate through each track because audio analysis doesn't accept a list of track IDs
-  analysis_json = []
+  api_list = []
   for track in tracks:
+    
+    #Pull the API data into a dictionary
     try:
       client_scope = client()
-      analysis = client_scope.audio_analysis(track)
-      track_clean = "track_id: " + track 
-      track_analysis = {track_clean: analysis}
+      track_analysis = client_scope.audio_analysis(track)
+      api_list.append(track_analysis)
     except Exception as err: #TODO: Need to figure out specific exceptions here
       timestamp = datetime.utcnow().replace(microsecond=0)
       error = f"{timestamp} ERROR: Issue gathering audio analysis data. Message: {err}"
@@ -101,9 +107,10 @@ def track_analysis():
       timestamp = datetime.utcnow().replace(microsecond=0)
       message = f"{timestamp} SUCCESS: Gathered audio analysis data."
       logging.info(message) 
+
+        #Create a json object from the API list
       try:
-        single_json = json.dumps(track_analysis, indent=2)
-        analysis_json.append(single_json)
+        analysis_json = json.dumps(api_list, indent=2)
       except ValueError as err:
         timestamp = datetime.utcnow().replace(microsecond=0)
         error = f"{timestamp} ERROR: Issue converting audio analysis data to JSON. Message: {err}"
@@ -112,5 +119,5 @@ def track_analysis():
         timestamp = datetime.utcnow().replace(microsecond=0)
         message = f"{timestamp} SUCCESS: Converted audio analysis data to JSON."
         logging.info(message)
-
+  
   return analysis_json
