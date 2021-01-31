@@ -107,8 +107,9 @@ def analysis_to_pg():
   load since it needs to be iterated in a different manner'''
 
   # Establish the necessary variables
-  analysis_json  = track_analysis()
-  table_data = {"track_analysis": analysis_json}
+  analysis_data  = track_analysis()
+  table = 'track_analysis'
+
 
   # Open a cursor for the insert statements
   conn = pg_conn()
@@ -138,8 +139,6 @@ def analysis_to_pg():
 
           # Loop through each dictionary entry to insert the data. Also creates 
           # the table if it doesn't exist.
-      for table, data in table_data.items():
-        for json_dict in data:
           try:
             create_table = '''create table if not exists {0}.{1}.{2} ( 
                 id serial not null primary key,
@@ -157,22 +156,23 @@ def analysis_to_pg():
             timestamp = datetime.utcnow().replace(microsecond=0)
             message = f"{timestamp} SUCCESS: The {table} table is in the {schema} schema."
             logging.info(message)
-            try:
-              timestamp = datetime.utcnow().replace(microsecond=0)
-              insert_data = '''insert into {0}.{1}.{2} (src, created_on_utc) 
-                  values ('{3}','{4}');'''.format(db, schema, table, json_dict, timestamp)
-              cursor.execute(insert_data)
-              conn.commit()
-            except (ProgrammingError, errors.InFailedSqlTransaction, errors.SyntaxError) as err:
-              timestamp = datetime.utcnow().replace(microsecond=0)
-              error = f"{timestamp} ERROR:Unable to insert data into the {table} table. Message: {err}"
-              success = False  #This will be used for the text message
-              logging.exception(error)
-            else:
-              timestamp = datetime.utcnow().replace(microsecond=0)
-              message = f"{timestamp} SUCCESS: Data was inserted into the {table} table."
-              success = True
-              logging.info(message)
+            for json_dict in analysis_data:
+              try:
+                timestamp = datetime.utcnow().replace(microsecond=0)
+                insert_data = '''insert into {0}.{1}.{2} (src, created_on_utc) 
+                    values ('{3}','{4}');'''.format(db, schema, table, json_dict, timestamp)
+                cursor.execute(insert_data)
+                conn.commit()
+              except (ProgrammingError, errors.InFailedSqlTransaction, errors.SyntaxError) as err:
+                timestamp = datetime.utcnow().replace(microsecond=0)
+                error = f"{timestamp} ERROR:Unable to insert data into the {table} table. Message: {err}"
+                success = False  #This will be used for the text message
+                logging.exception(error)
+              else:
+                timestamp = datetime.utcnow().replace(microsecond=0)
+                message = f"{timestamp} SUCCESS: Data was inserted into the {table} table."
+                success = True
+                logging.info(message)
   finally:
     conn.close()
     timestamp = datetime.utcnow().replace(microsecond=0)
