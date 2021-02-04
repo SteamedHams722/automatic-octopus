@@ -1,0 +1,10 @@
+numpy
+simplejson
+pandas
+urllib3
+spotipy
+gspread
+oauth2client
+smptlib
+email
+psycopg2
