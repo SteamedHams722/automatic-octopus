@@ -8,7 +8,7 @@ import sys
 import numpy as np
 from datetime import datetime, timezone
 import logging
-import simplejson as json
+import json
 import pandas as pd # Used fo data framing
 user_home = os.path.expanduser("~").replace(os.sep,'/')
 sys.path.append(user_home + r"/automatic-octopus/core/data_pull") #Need to explicitly add this folder to path
