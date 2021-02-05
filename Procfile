@@ -1,1 +1,1 @@
-web: python execute_load.py
+--chdir core execute_load:load_all

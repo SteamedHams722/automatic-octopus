@@ -6,3 +6,4 @@ spotipy
 gspread
 oauth2client
 psycopg2
+gunicorn
