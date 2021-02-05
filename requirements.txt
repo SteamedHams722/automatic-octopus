@@ -1,5 +1,4 @@
 numpy
-simplejson
 pandas
 urllib3
 spotipy
