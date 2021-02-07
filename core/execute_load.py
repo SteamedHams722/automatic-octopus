@@ -12,7 +12,7 @@ import logging
 user_home = os.path.expanduser("~").replace(os.sep,'/')
 sys.path.append(user_home + r"/automatic-octopus/core/storage")
 sys.path.append(user_home + r"/automatic-octopus/core/message")
-from load_tracks import tracks_to_pg, analysis_to_pg
+from load_tracks import tracks_to_pg
 from load_responses import responses_to_pg
 from transmit import communicado
 
@@ -28,8 +28,7 @@ def load_all():
   track_success = tracks_to_pg()
   response_success = responses_to_pg(sheet_name)
   sleep(60) #Making the app sleep before it executes the analysis function
-  analysis_success = analysis_to_pg()
-  success_dict = {'tracks': track_success, 'responses': response_success, 'analysis': analysis_success}
+  success_dict = {'tracks': track_success, 'responses': response_success}
 
   for key, val in success_dict.items():
     if val: # A True value means the job succeeded.
@@ -41,3 +40,6 @@ def load_all():
       timestamp = datetime.utcnow().replace(microsecond=0)
       message = f" {timestamp} Failure message sent. There was an issue when trying to load data"
       logging.info(message)
+  
+
+load_all()

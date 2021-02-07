@@ -9,7 +9,7 @@ logging.basicConfig(filename='execute.log', filemode='a', level='INFO')
 
 # Function to be called in other files
 def recently_played():
-  """Return the recently played tracks API data"""
+  '''Return the recently played tracks API data'''
   # Set-up authorization scope. This is needed since it accesses user data
   scope = 'user-read-recently-played'
   auth_token = oauth(scope=scope)
@@ -41,7 +41,7 @@ def recently_played():
   return results, info_json
 
 def track_ids():
-  """Gets the track IDs for the recently played tracks"""
+  '''Gets the track IDs for the recently played tracks'''
   results, _ = recently_played()
 
   #Loop through each dictionary in the items list to get the track IDs
@@ -56,7 +56,7 @@ def track_ids():
   return tracks
 
 def track_features():
-  """Return high level features on each recently played track"""
+  '''Return high level features on each recently played track'''
   tracks = track_ids()
 
   #Pull the SPI into a dictionary
@@ -87,7 +87,12 @@ def track_features():
   return features_json
   
 def track_analysis():
-  """Return granular analysis on each recently played track"""
+  '''Return granular analysis on each recently played track. IMPORTANT: This is
+  not being used in the execute_load script because the size of each load is too 
+  large and it is not performant to query. The time and storage is not worth the
+  data it provides. However, I'm keeping it here in case it becomes necessary and 
+  I have access to a more powerful platform'''
+
   tracks = track_ids()
   client_scope = client()
 
@@ -129,5 +134,3 @@ def track_analysis():
         logging.info(message)
     
   return analysis_json
-
-#print(track_analysis())
