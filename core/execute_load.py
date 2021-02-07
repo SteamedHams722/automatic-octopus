@@ -7,28 +7,29 @@
 import sys
 import os
 from datetime import datetime
-from time import sleep
 import logging
 user_home = os.path.expanduser("~").replace(os.sep,'/')
 sys.path.append(user_home + r"/automatic-octopus/core/storage")
 sys.path.append(user_home + r"/automatic-octopus/core/message")
 from load_tracks import tracks_to_pg
-from load_responses import responses_to_pg
 from transmit import communicado
 
 # Set-up logging
 logging.basicConfig(filename='execute.log', filemode='a', level='INFO')
 
 def load_all():
-  '''Need to have a function here so Heroku can call it'''
+  '''Need to have a function here so Heroku can call it. I'm currently excluding the
+  response calls since it is not working correctly on raspberry pi.'''
+
   #Get the environment variables needed to load the data
-  sheet_name = os.getenv("response_sheet")
+  #sheet_name = os.getenv("response_sheet")
 
   # Load the tables and send a text message if it fails
   track_success = tracks_to_pg()
-  response_success = responses_to_pg(sheet_name)
-  sleep(60) #Making the app sleep before it executes the analysis function
-  success_dict = {'tracks': track_success, 'responses': response_success}
+  success_dict = {'tracks': track_success}
+
+  #TODO: Add responses function call and add the results to a success dictionary
+  # with the track_success data
 
   for key, val in success_dict.items():
     if val: # A True value means the job succeeded.
