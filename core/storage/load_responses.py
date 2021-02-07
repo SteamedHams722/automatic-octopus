@@ -77,7 +77,9 @@ def responses_to_pg(sheet_name):
               cursor.execute(insert_data)
               conn.commit()
 
-              #Delete the old data since it's not necessary anymore
+              #Delete the old data since it's not necessary anymore. Doing this separately
+              # from the table create because if the data fails to load I don't want to lose
+              # the previous data
               delete_old = "delete from {0}.{1}.{2} where created_on_utc < '{3}'".format(db, schema, table, timestamp)
               cursor.execute(delete_old)
               conn.commit()
@@ -98,3 +100,6 @@ def responses_to_pg(sheet_name):
       logging.info(message)
       
   return success
+
+
+responses_to_pg(os.environ['response_sheet'])
