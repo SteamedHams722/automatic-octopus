@@ -102,4 +102,5 @@ def responses_to_pg(sheet_name):
   return success
 
 
-responses_to_pg(os.environ['response_sheet'])
+#Use for testing
+# responses_to_pg(os.environ['response_sheet'])
