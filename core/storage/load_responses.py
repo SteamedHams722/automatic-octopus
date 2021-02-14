@@ -19,7 +19,7 @@ def responses_to_pg(sheet_name):
 
 # Establish the necessary variables
   db = "nucleus"
-  schema = "surveys"
+  schema = "survey"
   responses_json = get_responses(sheet_name)
   responses_data = responses_json.replace("'","''") #Have to escape single quotes in a postgres friendly way
   table = "responses"
