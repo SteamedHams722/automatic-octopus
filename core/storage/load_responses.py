@@ -22,6 +22,7 @@ def responses_to_pg(sheet_name):
   schema = "survey"
   responses_json = get_responses(sheet_name)
   responses_data = responses_json.replace("'","''") #Have to escape single quotes in a postgres friendly way
+  user_id = 'e12dfd64bc687b2cb067e8e6116233c3' #Temporary solution until a more scalable solution is created
   table = "responses"
   # Open a cursor for the insert statements
   conn = pg_conn()
@@ -53,6 +54,7 @@ def responses_to_pg(sheet_name):
           try:
               create_table = '''create table if not exists {0}.{1}.{2} ( 
                   id serial not null primary key,
+                  user_id varchar(32) not null,
                   src json not null,
                   created_on_utc timestamp not null
                   );'''.format(db, schema, table)
@@ -72,8 +74,8 @@ def responses_to_pg(sheet_name):
           # used to expand them out further.
           try:
               timestamp = datetime.utcnow().replace(microsecond=0)
-              insert_data = '''insert into {0}.{1}.{2} (src, created_on_utc) 
-                  values ('{3}','{4}');'''.format(db, schema, table, responses_data, timestamp)
+              insert_data = '''insert into {0}.{1}.{2} (user_id, src, created_on_utc) 
+                  values ('{3}','{4}', '{5}');'''.format(db, schema, table, user_id, responses_data, timestamp)
               cursor.execute(insert_data)
               conn.commit()
 
@@ -101,6 +103,5 @@ def responses_to_pg(sheet_name):
       
   return success
 
-
 #Use for testing
-# responses_to_pg(os.environ['response_sheet'])
+responses_to_pg(os.environ['response_sheet'])
