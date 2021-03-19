@@ -1,4 +1,4 @@
 # automatic-octopus
 Objectives
 - Automate the collection of behavioral and biometric data.
-- Create predictions based on the data.
+- Load the data into a postgres database for further analysis and transformation.
