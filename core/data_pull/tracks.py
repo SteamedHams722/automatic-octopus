@@ -10,117 +10,117 @@ logging.basicConfig(filename='execute.log', filemode='a', level='INFO')
 
 # Function to be called in other files
 def recently_played():
-  '''Return the recently played tracks API data'''
-  # Set-up authorization scope. This is needed since it accesses user data
-  scope = 'user-read-recently-played'
-  auth_token = oauth(scope=scope)
+    '''Return the recently played tracks API data'''
+    # Set-up authorization scope. This is needed since it accesses user data
+    scope = 'user-read-recently-played'
+    auth_token = oauth(scope=scope)
 
-  # Pull in API data. No need to worry about before/after since that is better handled within SQL
-  try:
-    results = auth_token.current_user_recently_played(limit=50, after=None, before=None)
-  except SpotifyException as err:
-    timestamp = datetime.utcnow().replace(microsecond=0)
-    error = f"{timestamp} ERROR: Issue gathering recently played data. Message: {err}"
-    logging.exception(error) 
-  else:
-    timestamp = datetime.utcnow().replace(microsecond=0)
-    message = f"{timestamp} SUCCESS: Gathered recently played data."
-    logging.info(message)
-
-    # Convert the dictionary to a json object
+    # Pull in API data. No need to worry about before/after since that is better handled within SQL
     try:
-      info_json = json.dumps(results, indent=2)
-    except ValueError as err:
-      timestamp = datetime.utcnow().replace(microsecond=0)
-      error = f"{timestamp} ERROR: Issue converting recently played data to JSON. Message: {err}"
-      logging.exception(error) 
+        results = auth_token.current_user_recently_played(limit=50, after=None, before=None)
+    except SpotifyException as err:
+        timestamp = datetime.utcnow().replace(microsecond=0)
+        error = f"{timestamp} ERROR: Issue gathering recently played data. Message: {err}"
+        logging.exception(error) 
     else:
-      timestamp = datetime.utcnow().replace(microsecond=0)
-      message = f"{timestamp} SUCCESS: Converted recently played data to JSON."
-      logging.info(message) 
-    
-  return results, info_json
+        timestamp = datetime.utcnow().replace(microsecond=0)
+        message = f"{timestamp} SUCCESS: Gathered recently played data."
+        logging.info(message)
+
+        # Convert the dictionary to a json object
+        try:
+            info_json = json.dumps(results, indent=2)
+        except ValueError as err:
+            timestamp = datetime.utcnow().replace(microsecond=0)
+            error = f"{timestamp} ERROR: Issue converting recently played data to JSON. Message: {err}"
+            logging.exception(error) 
+        else:
+            timestamp = datetime.utcnow().replace(microsecond=0)
+            message = f"{timestamp} SUCCESS: Converted recently played data to JSON."
+            logging.info(message) 
+        
+    return results, info_json
 
 def get_ids():
-  '''Gets the track and artist IDs for the recently played tracks'''
-  results, _ = recently_played()
+    '''Gets the track and artist IDs for the recently played tracks'''
+    results, _ = recently_played()
 
-  #Loop through each dictionary in the items list to get the track IDs
-  tracks = []
-  for item in results['items']:
-    tracks.append(item['track']['id'])
+    #Loop through each dictionary in the items list to get the track IDs
+    tracks = []
+    for item in results['items']:
+        tracks.append(item['track']['id'])
+        
+    artists = []
+    for item in results['items']:
+        for artist in item['track']['artists']:
+            artists.append(artist['id'])
     
-  artists = []
-  for item in results['items']:
-    for artist in item['track']['artists']:
-      artists.append(artist['id'])
-  
-  # De-duplicate the IDs in the list. This prevents downstream functions from
-  # hitting the 100 ID limit
-  tracks = list(dict.fromkeys(tracks))
+    # De-duplicate the IDs in the list. This prevents downstream functions from
+    # hitting the 100 ID limit
+    tracks = list(dict.fromkeys(tracks))
 
-  return tracks, artists
+    return tracks, artists
 
 def track_features():
-  '''Return high level features on each recently played track'''
-  tracks, _ = get_ids()
+    '''Return high level features on each recently played track'''
+    tracks, _ = get_ids()
 
-  #Pull the SPI into a dictionary
-  try:
-    client_scope = client()
-    features = client_scope.audio_features(tracks)
-  except SpotifyException as err:
-    timestamp = datetime.utcnow().replace(microsecond=0)
-    error = f"{timestamp} ERROR: Issue gathering track features data. Message: {err}"
-    logging.exception(error) 
-  else:
-    timestamp = datetime.utcnow().replace(microsecond=0)
-    message = f"{timestamp} SUCCESS: Gathered track features data."
-    logging.info(message) 
-
-    #Create a json object from the dictionary
+    #Pull the SPI into a dictionary
     try:
-      features_json = json.dumps(features, indent=2)
-    except ValueError as err:
-      timestamp = datetime.utcnow().replace(microsecond=0)
-      error = f"{timestamp} ERROR: Issue converting track features data to JSON. Message: {err}"
-      logging.exception(error) 
+        client_scope = client()
+        features = client_scope.audio_features(tracks)
+    except SpotifyException as err:
+        timestamp = datetime.utcnow().replace(microsecond=0)
+        error = f"{timestamp} ERROR: Issue gathering track features data. Message: {err}"
+        logging.exception(error) 
     else:
-      timestamp = datetime.utcnow().replace(microsecond=0)
-      message = f"{timestamp} SUCCESS: Converted track features data to JSON."
-      logging.info(message) 
+        timestamp = datetime.utcnow().replace(microsecond=0)
+        message = f"{timestamp} SUCCESS: Gathered track features data."
+        logging.info(message) 
 
-  return features_json
+        #Create a json object from the dictionary
+        try:
+            features_json = json.dumps(features, indent=2)
+        except ValueError as err:
+            timestamp = datetime.utcnow().replace(microsecond=0)
+            error = f"{timestamp} ERROR: Issue converting track features data to JSON. Message: {err}"
+            logging.exception(error) 
+        else:
+            timestamp = datetime.utcnow().replace(microsecond=0)
+            message = f"{timestamp} SUCCESS: Converted track features data to JSON."
+            logging.info(message) 
+
+    return features_json
 
 def track_artists():
-  '''Bring in the artist-related data tied to the recently played tracks'''
-  _, artist_ids = get_ids()
+    '''Bring in the artist-related data tied to the recently played tracks'''
+    _, artist_ids = get_ids()
 
-  #Have to limit the number of artists used since there are API limits
-  top_artists = artist_ids[:50]
-  #Pull the SPI into a dictionary
-  try:
-    client_scope = client()
-    artists = client_scope.artists(top_artists)
-  except SpotifyException as err:
-    timestamp = datetime.utcnow().replace(microsecond=0)
-    error = f"{timestamp} ERROR: Issue gathering track artist data. Message: {err}"
-    logging.exception(error) 
-  else:
-    timestamp = datetime.utcnow().replace(microsecond=0)
-    message = f"{timestamp} SUCCESS: Gathered track artist data."
-    logging.info(message) 
-
-    #Create a json object from the dictionary
+    #Have to limit the number of artists used since there are API limits
+    top_artists = artist_ids[:50]
+    #Pull the SPI into a dictionary
     try:
-      artists_json = json.dumps(artists, indent=2)
-    except ValueError as err:
-      timestamp = datetime.utcnow().replace(microsecond=0)
-      error = f"{timestamp} ERROR: Issue converting track artist data to JSON. Message: {err}"
-      logging.exception(error) 
+        client_scope = client()
+        artists = client_scope.artists(top_artists)
+    except SpotifyException as err:
+        timestamp = datetime.utcnow().replace(microsecond=0)
+        error = f"{timestamp} ERROR: Issue gathering track artist data. Message: {err}"
+        logging.exception(error) 
     else:
-      timestamp = datetime.utcnow().replace(microsecond=0)
-      message = f"{timestamp} SUCCESS: Converted track features data to JSON."
-      logging.info(message) 
+        timestamp = datetime.utcnow().replace(microsecond=0)
+        message = f"{timestamp} SUCCESS: Gathered track artist data."
+        logging.info(message) 
 
-  return artists_json
+        #Create a json object from the dictionary
+        try:
+            artists_json = json.dumps(artists, indent=2)
+        except ValueError as err:
+            timestamp = datetime.utcnow().replace(microsecond=0)
+            error = f"{timestamp} ERROR: Issue converting track artist data to JSON. Message: {err}"
+            logging.exception(error) 
+        else:
+            timestamp = datetime.utcnow().replace(microsecond=0)
+            message = f"{timestamp} SUCCESS: Converted track features data to JSON."
+            logging.info(message) 
+
+    return artists_json
