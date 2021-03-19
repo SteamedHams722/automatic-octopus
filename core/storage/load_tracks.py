@@ -107,6 +107,3 @@ def tracks_to_pg():
                         logging.info(message)
 
     return success
-
-test = tracks_to_pg()
-print(test)

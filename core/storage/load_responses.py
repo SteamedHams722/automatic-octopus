@@ -94,6 +94,3 @@ def responses_to_pg(sheet_name):
                 logging.info(message)
 
     return success
-
-#Use for testing
-responses_to_pg(os.environ['response_sheet'])
