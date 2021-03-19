@@ -28,7 +28,6 @@ def get_responses(sheet_name):
     try:
         response_df = pd.read_csv(file_path)
     except (IndexError, FileNotFoundError, NameError, ValueError) as err:
-       
         timestamp = datetime.utcnow().replace(microsecond=0)
         error = f"{timestamp} ERROR: Dataframe for {sheet_name} not created. Message: {err}"
         logging.exception(error)

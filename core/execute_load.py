@@ -18,29 +18,29 @@ from transmit import communicado
 logging.basicConfig(filename='execute.log', filemode='a', level='INFO')
 
 def load_all():
-  '''Need to have a function here so Heroku can call it. I'm currently excluding the
-  response calls since it is not working correctly on raspberry pi.'''
+    '''Need to have a function here so Heroku can call it. I'm currently excluding the
+    response calls since it is not working correctly on raspberry pi.'''
 
-  #Get the environment variables needed to load the data
-  #sheet_name = os.getenv("response_sheet")
+    #Get the environment variables needed to load the data
+    #sheet_name = os.getenv("response_sheet")
 
-  # Load the tables and send a text message if it fails
-  track_success = tracks_to_pg()
-  success_dict = {'tracks': track_success}
+    # Load the tables and send a text message if it fails
+    track_success = tracks_to_pg()
+    success_dict = {'tracks': track_success}
 
-  #TODO: Add responses function call and add the results to a success dictionary
-  # with the track_success data
+    #TODO: Add responses function call and add the results to a success dictionary
+    # with the track_success data
 
-  for key, val in success_dict.items():
-    if val: # A True value means the job succeeded.
-      #communicado(table_group=key, success=val) #This is only needed for testing.
-      timestamp = datetime.utcnow().replace(microsecond=0)
-      message = f" {timestamp} No message sent. Data load jobs succeeded."
-    else:
-      communicado(table_group=key, success=val)
-      timestamp = datetime.utcnow().replace(microsecond=0)
-      message = f" {timestamp} Failure message sent. There was an issue when trying to load data"
-      logging.info(message)
+    for key, val in success_dict.items():
+        if val: # A True value means the job succeeded.
+            #communicado(table_group=key, success=val) #This is only needed for testing.
+            timestamp = datetime.utcnow().replace(microsecond=0)
+            message = f" {timestamp} No message sent. Data load jobs succeeded."
+        else:
+            communicado(table_group=key, success=val)
+            timestamp = datetime.utcnow().replace(microsecond=0)
+            message = f" {timestamp} Failure message sent. There was an issue when trying to load data"
+            logging.info(message)
   
 
 load_all()

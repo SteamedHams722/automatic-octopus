@@ -46,7 +46,6 @@ def oauth(scope):
             code = sp_oauth.parse_response_code(response)
             token_info = sp_oauth.get_access_token(code)
             token = token_info['access_token']
-
         sp = spotipy.Spotify(auth=token)
     except (MaxRetryError, NewConnectionError, ConnectTimeoutError, SpotifyOauthError) as err:
         timestamp = datetime.utcnow().replace(microsecond=0)
