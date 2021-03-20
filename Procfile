@@ -1,1 +1,1 @@
---chdir core execute_load:load_all
+web: gunicorn app:app
