@@ -29,7 +29,7 @@
 ## About The Project
 
 This project automates the collection of API data that can be used for machine learning.
-It's primary source is Spotify track and artist data. Since the recently played tracks for
+Its primary source is Spotify track and artist data. Since the recently played tracks for
 a user are limited to 50 tracks, it is necessary to regularly pull the data and store it
 in a Postgres database.
 
