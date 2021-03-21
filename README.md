@@ -53,6 +53,8 @@ To get a local copy up and running follow these simple steps.
 
 
 ### Prerequisites
+1. [Install Python](https://www.python.org/downloads/)
+2. [Install Postgres](https://www.postgresql.org/download/)
 
 The requirements.txt file can be used to install all dependencies for the project.
 Make sure to create a [virtual environment](https://packaging.python.org/guides/installing-using-pip-and-virtual-environments/) before installing the requirements file.
