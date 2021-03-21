@@ -109,7 +109,7 @@ Distributed under the GPL-3.0 License. See `LICENSE` for more information.
 <!-- ACKNOWLEDGEMENTS -->
 ## Acknowledgements
 
-* [Automate the Boring Stuff with Python](https://automatetheboringstuff.com/)
-* [Python Crash Course](https://nostarch.com/pythoncrashcourse2e)
+* [Al Sweigart](https://automatetheboringstuff.com/)
+* [Eric Matthes](https://nostarch.com/pythoncrashcourse2e)
 * [Paul Lamere](https://github.com/plamere)
 * [Best-README-Template](https://github.com/othneildrew/Best-README-Template)
