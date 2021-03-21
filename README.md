@@ -66,9 +66,7 @@ See here for further instructions: https://packaging.python.org/guides/installin
    ```sh
    git clone https://github.com/SteamedHams722/automatic-octopus.git
    ```
-2. ``sh
-    Create a Spotify account: https://www.spotify.com/us/signup/
-    ```
+2. Create a Spotify account: https://www.spotify.com/us/signup/
 
 
 
