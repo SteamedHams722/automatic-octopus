@@ -19,10 +19,11 @@
     <li><a href="#roadmap">Roadmap</a></li>
     <li><a href="#contributing">Contributing</a></li>
     <li><a href="#license">License</a></li>
-    <li><a href="#contact">Contact</a></li>
     <li><a href="#acknowledgements">Acknowledgements</a></li>
   </ol>
 </details>
+
+
 
 <!-- ABOUT THE PROJECT -->
 ## About The Project
@@ -35,10 +36,13 @@ in a Postgres database.
 There is also a simple API call to get Google forms survey data to correlate with the
 Spotify data. Over time, even more API calls will be added.
 
+
+
 ### Built With
 
 * [Python](https://www.python.org/)
 * [Spotipy](https://spotipy.readthedocs.io/en/2.17.1/)
+
 
 
 <!-- GETTING STARTED -->
@@ -46,11 +50,15 @@ Spotify data. Over time, even more API calls will be added.
 
 To get a local copy up and running follow these simple steps.
 
+
+
 ### Prerequisites
 
 The requirements.txt file can be used to install all dependencies for the project.
 Make sure to create a virtual environment before installing the requirements file.
 See here for further instructions: https://packaging.python.org/guides/installing-using-pip-and-virtual-environments/
+
+
 
 ### Installation
 
@@ -62,6 +70,8 @@ See here for further instructions: https://packaging.python.org/guides/installin
     Create a Spotify account: https://www.spotify.com/us/signup/
     ```
 
+
+
 <!-- USAGE EXAMPLES -->
 ## Usage
 
@@ -71,10 +81,14 @@ will be added.
 
 _For more examples, please refer to the [Documentation](https://example.com)_
 
+
+
 <!-- ROADMAP -->
 ## Roadmap
 
 See the [open issues](https://github.com/SteamedHams722/automatic-octopus) for a list of proposed features (and known issues).
+
+
 
 <!-- CONTRIBUTING -->
 ## Contributing
@@ -87,14 +101,18 @@ Contributions are what make the open source community such an amazing place to b
 4. Push to the Branch (`git push origin feature/AmazingFeature`)
 5. Open a Pull Request
 
+
+
 <!-- LICENSE -->
 ## License
 
 Distributed under the GPL-3.0 License. See `LICENSE` for more information.
 
+
+
 <!-- ACKNOWLEDGEMENTS -->
 ## Acknowledgements
 
-* [Best-README-Template](https://github.com/othneildrew/Best-README-Template)
 * [Automate the Boring Stuff with Python](https://automatetheboringstuff.com/)
 * [Python Crash Course](https://nostarch.com/pythoncrashcourse2e)
+* [Best-README-Template](https://github.com/othneildrew/Best-README-Template)
