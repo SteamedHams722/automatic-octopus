@@ -55,8 +55,7 @@ To get a local copy up and running follow these simple steps.
 ### Prerequisites
 
 The requirements.txt file can be used to install all dependencies for the project.
-Make sure to create a virtual environment before installing the requirements file.
-See here for further instructions: https://packaging.python.org/guides/installing-using-pip-and-virtual-environments/
+Make sure to create a [virtual environment](https://packaging.python.org/guides/installing-using-pip-and-virtual-environments/) before installing the requirements file.
 
 
 
@@ -66,7 +65,7 @@ See here for further instructions: https://packaging.python.org/guides/installin
    ```sh
    git clone https://github.com/SteamedHams722/automatic-octopus.git
    ```
-2. Create a Spotify account: https://www.spotify.com/us/signup/
+2. [Create a Spotify account](https://www.spotify.com/us/signup/)
 
 
 
