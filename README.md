@@ -77,8 +77,6 @@ The primary use case for this project is to pull a user's recently played tracks
 Spotify and store it in a Postgres database. Overtime, connections to additional APIs
 will be added.
 
-_For more examples, please refer to the [Documentation](https://example.com)_
-
 
 
 <!-- ROADMAP -->
