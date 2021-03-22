@@ -11,7 +11,7 @@ import logging
 import json
 import pandas as pd # Used fo data framing
 user_home = os.path.expanduser("~")
-sys.path.append(os.path.join(user_home, 'automatic-octopus', 'core','data_pull'))
+sys.path.append(os.path.join(user_home, 'core', 'data_pull'))
 from responses import fetch_data#pylint: disable=import-error
 
 # Set-up logging
