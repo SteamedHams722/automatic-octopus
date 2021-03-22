@@ -9,8 +9,8 @@ import os
 from datetime import datetime
 import logging
 user_home = os.path.expanduser("~")
-sys.path.append(os.path.join(user_home, 'automatic-octopus', 'core','storage'))
-sys.path.append(os.path.join(user_home, 'automatic-octopus', 'core','message'))
+sys.path.append(os.path.join(user_home, 'core', 'storage'))
+sys.path.append(os.path.join(user_home, 'core', 'message'))
 from load_tracks import tracks_to_pg
 from load_responses import responses_to_pg
 from transmit import communicado
@@ -41,3 +41,5 @@ def load_all():
             timestamp = datetime.utcnow().replace(microsecond=0)
             message = f" {timestamp} Failure message sent. There was an issue when trying to load data"
             logging.info(message)
+
+load_all()

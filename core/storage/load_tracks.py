@@ -9,7 +9,7 @@ import os
 import logging
 from datetime import datetime
 user_home = os.path.expanduser("~")
-sys.path.append(os.path.join(user_home, 'automatic-octopus', 'core','data_pull'))
+sys.path.append(os.path.join(user_home, 'core', 'data_pull'))
 from tracks import track_features, recently_played, track_artists#pylint: disable=import-error
 from postgres_connections import pg_conn
 from psycopg2 import ProgrammingError, errors
