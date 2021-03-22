@@ -22,11 +22,8 @@ def load_all():
     '''Need to have a function here so Heroku can call it. I'm currently excluding the
     response calls since it is not working correctly on raspberry pi.'''
 
-    #Get the environment variables needed to load the data
-    #sheet_name = os.getenv("response_sheet")
-
     # Load the tables and send a text message if it fails
-    success_dict = {'tracks': tracks_to_pg(), 'responses': responses_to_pg(os.environ['response_sheet'])}
+    success_dict = {'tracks': tracks_to_pg(), 'responses': responses_to_pg(os.getenv('response_sheet'))}
 
     #TODO: Add responses function call and add the results to a success dictionary
     # with the track_success data
