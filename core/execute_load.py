@@ -33,7 +33,7 @@ def load_all():
 
     for key, val in success_dict.items():
         if val: # A True value means the job succeeded.
-            communicado(table_group=key, success=val) #This is only needed for testing.
+            #communicado(table_group=key, success=val) #This is only needed for testing.
             timestamp = datetime.utcnow().replace(microsecond=0)
             message = f" {timestamp} No message sent. Data load jobs succeeded."
         else:
@@ -41,5 +41,3 @@ def load_all():
             timestamp = datetime.utcnow().replace(microsecond=0)
             message = f" {timestamp} Failure message sent. There was an issue when trying to load data"
             logging.info(message)
-  
-load_all()
