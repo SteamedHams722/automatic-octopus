@@ -8,10 +8,11 @@ import sys
 import os
 from datetime import datetime
 import logging
-user_home = os.path.expanduser("~").replace(os.sep,'/')
-sys.path.append(user_home + r"/automatic-octopus/core/storage")
-sys.path.append(user_home + r"/automatic-octopus/core/message")
+user_home = os.path.expanduser("~")
+sys.path.append(os.path.join(user_home, 'automatic-octopus', 'core','storage'))
+sys.path.append(os.path.join(user_home, 'automatic-octopus', 'core','message'))
 from load_tracks import tracks_to_pg
+from load_responses import responses_to_pg
 from transmit import communicado
 
 # Set-up logging
@@ -25,15 +26,14 @@ def load_all():
     #sheet_name = os.getenv("response_sheet")
 
     # Load the tables and send a text message if it fails
-    track_success = tracks_to_pg()
-    success_dict = {'tracks': track_success}
+    success_dict = {'tracks': tracks_to_pg(), 'responses': responses_to_pg(os.environ['response_sheet'])}
 
     #TODO: Add responses function call and add the results to a success dictionary
     # with the track_success data
 
     for key, val in success_dict.items():
         if val: # A True value means the job succeeded.
-            #communicado(table_group=key, success=val) #This is only needed for testing.
+            communicado(table_group=key, success=val) #This is only needed for testing.
             timestamp = datetime.utcnow().replace(microsecond=0)
             message = f" {timestamp} No message sent. Data load jobs succeeded."
         else:
@@ -42,5 +42,4 @@ def load_all():
             message = f" {timestamp} Failure message sent. There was an issue when trying to load data"
             logging.info(message)
   
-
 load_all()
