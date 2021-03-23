@@ -14,7 +14,7 @@ logging.basicConfig(filename='execute.log', filemode='a', level='INFO')
 
 #Authorization credentials for the Google Sheet
 scope = ['https://spreadsheets.google.com/feeds','https://www.googleapis.com/auth/drive']
-secret_file = os.getenv('service_account')
+secret_file = os.getenv('GOOGLE_APPLICATION_CREDENTIALS')
 creds = ServiceAccountCredentials.from_json_keyfile_name(secret_file, scope)
 client = gspread.authorize(creds)
 
