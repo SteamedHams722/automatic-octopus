@@ -31,8 +31,8 @@ def fetch_data(sheet_name):
 
     #Create a local CSV file that will hold the data so it can used for data analytics
     #Also, create a local folder to store them if it doesn't exist.
-    user_home = os.path.expanduser("~").replace(os.sep,'/')
-    data_dir = user_home + r'/automatic-octopus/data/'
+    user_home = os.path.expanduser("~")
+    data_dir = os.path.join(user_home, 'automatic-octopus', 'data')
     if not os.path.exists(data_dir):
         os.makedirs(data_dir)
     target_csv = data_dir + sheet_name
