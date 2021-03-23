@@ -1,6 +1,6 @@
 '''This is just a placeholder app for establishing the dynos'''
 
-from os import environ
+import os
 from flask import Flask
 
 app = Flask(__name__)
@@ -10,4 +10,4 @@ def index():
     return 'Champions of Winning, Superb!'
 
 if __name__ == "__main__":
-    app.run(environ.get('PORT'))
+    app.run(os.getenv('PORT'))

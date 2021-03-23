@@ -9,7 +9,7 @@
 
 # Load Libraries
 from datetime import datetime
-from os import getenv #This will be used for sending the text message
+import os  #This will be used for sending the text message
 import smtplib #This will allow us to use the SMS gateway
 from email.mime.multipart import MIMEMultipart #Needed for sending text from an email
 from email.mime.text import MIMEText #Needed for sending the text from an email
@@ -26,15 +26,15 @@ def communicado(table_group, success=False):
       results = f"\nERROR: {timestamp} Data failed to load into the {table_group} table(s).\n"
 
   #Text recipient variables
-  phone = getenv('Phone')
-  sms_gateway = getenv('Gateway')
+  phone = os.getenv('uesr_phone')
+  sms_gateway = os.getenv('user_gateway')
   recipient_address = '+1' + phone + sms_gateway
 
   # Credentials for the entity sending the text. Currently stored as local variables
   # since this is not a public facing app yet, but will want to change this
   # before it is public.
-  sender_email = getenv('messenger')
-  sender_pass = getenv('password') # Need to remove this and replace with more secure option
+  sender_email = os.getenv('messenger')
+  sender_pass = os.getenv('messenger_password') # Need to remove this and replace with more secure option
   smtp = 'smtp.gmail.com'
   port = 587
   server = smtplib.SMTP(smtp, port)
