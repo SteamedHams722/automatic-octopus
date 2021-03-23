@@ -18,7 +18,7 @@ from psycopg2 import ProgrammingError, errors
 logging.basicConfig(filename='execute.log', filemode='a', level='INFO')
 
 # Establish basic Postgeres variables that will be used in both functions
-db = "nucleus"
+db = os.getenv('POSTGRES_DB')
 schema = "spotify"
 
 def tracks_to_pg():

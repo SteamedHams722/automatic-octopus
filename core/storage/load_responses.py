@@ -18,7 +18,7 @@ def responses_to_pg(sheet_name):
     '''This function loads the json responses data into postgres'''
 
     # Establish the necessary variables
-    db = 'nucleus'
+    db = os.getenv('POSTGRES_DB')
     schema = 'survey'
     responses_json = get_responses(sheet_name)
     responses_data = responses_json.replace("'","''") #Have to escape single quotes in a postgres friendly way
