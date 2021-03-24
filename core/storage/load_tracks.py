@@ -10,7 +10,7 @@ import logging
 from datetime import datetime
 user_home = os.path.expanduser("~")
 sys.path.append(os.path.join(user_home, 'core', 'data_pull'))
-from tracks import track_features, recently_played, track_artists#pylint: disable=import-error
+from tracks import track_features, recently_played #pylint: disable=import-error
 from postgres_connections import pg_conn#pylint: disable=import-error
 from psycopg2 import ProgrammingError, errors
 
@@ -30,9 +30,7 @@ def tracks_to_pg():
     info_data = info_json.replace("'","''") #Have to escape single quotes in a postgres friendly way
     features_json = track_features()
     features_data = features_json.replace("'","''")
-    artists_json = track_artists()
-    artists_data = artists_json.replace("'","''")
-    table_data = {'track_info': info_data, 'track_features': features_data, 'track_artists': artists_data}
+    table_data = {'track_info': info_data, 'track_features': features_data}
     user_id = 'e12dfd64bc687b2cb067e8e6116233c3' #Temporary solution until a more scalable solution is created
 
     # Open the postgres connection
