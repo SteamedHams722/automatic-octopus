@@ -38,5 +38,3 @@ def load_all():
             timestamp = datetime.utcnow().replace(microsecond=0)
             message = f" {timestamp} Failure message sent. There was an issue when trying to load data"
             logging.info(message)
-
-load_all()

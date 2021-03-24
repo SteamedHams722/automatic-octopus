@@ -14,7 +14,7 @@ logging.basicConfig(filename='execute.log', filemode='a', level='INFO')
 
 #Authorization credentials for the Google Sheet
 scope = ['https://spreadsheets.google.com/feeds','https://www.googleapis.com/auth/drive']
-secret_file = os.getenv('service_account')
+secret_file = os.getenv('GOOGLE_APPLICATION_CREDENTIALS')
 creds = ServiceAccountCredentials.from_json_keyfile_name(secret_file, scope)
 client = gspread.authorize(creds)
 
@@ -31,8 +31,8 @@ def fetch_data(sheet_name):
 
     #Create a local CSV file that will hold the data so it can used for data analytics
     #Also, create a local folder to store them if it doesn't exist.
-    user_home = os.path.expanduser("~").replace(os.sep,'/')
-    data_dir = user_home + r'/automatic-octopus/data/'
+    user_home = os.path.expanduser("~")
+    data_dir = os.path.join(user_home, 'automatic-octopus', 'data')
     if not os.path.exists(data_dir):
         os.makedirs(data_dir)
     target_csv = data_dir + sheet_name
