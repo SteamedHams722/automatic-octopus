@@ -1,2 +1,1 @@
-web: gunicorn app:app
-worker: echo $SPOTIPY_CACHE > .cache
+worker: python3 app.py
