@@ -7,7 +7,7 @@
 import sys
 import os
 from datetime import datetime
-import logging
+import rollbar
 user_home = os.path.expanduser("~")
 sys.path.append(os.path.join(user_home, 'core', 'storage'))
 sys.path.append(os.path.join(user_home, 'core', 'message'))
@@ -15,8 +15,8 @@ from load_tracks import tracks_to_pg
 from load_responses import responses_to_pg
 from transmit import communicado
 
-# Set-up logging
-logging.basicConfig(filename='execute.log', filemode='a', level='INFO')
+# Set-up rollbar
+rollbar.init(os.getenv('ROLLBAR_ACCESS_TOKEN'))
 
 # Create or overwrite the Spotify Oauth cache file with the cache variable data
 # Eventually, this will have to be scaled for each user.
@@ -31,12 +31,18 @@ def load_all():
     #TODO: Add responses function call and add the results to a success dictionary
     # with the track_success data
     for key, val in success_dict.items():
-        if val: # A True value means the job succeeded.
-            #communicado(table_group=key, success=val) #This is only needed for testing.
-            timestamp = datetime.utcnow().replace(microsecond=0)
-            message = f" {timestamp} No message sent. Data load jobs succeeded."
-        else:
-            communicado(table_group=key, success=val)
-            timestamp = datetime.utcnow().replace(microsecond=0)
-            message = f" {timestamp} Failure message sent. There was an issue when trying to load data"
-            logging.info(message)
+        try:
+            if val: # A True value means the job succeeded.
+                #communicado(table_group=key, success=val) #This is only needed for testing.
+                timestamp = datetime.utcnow().replace(microsecond=0)
+                message = f" {timestamp} No message sent. Data load jobs succeeded."
+            else:
+                communicado(table_group=key, success=val)
+                timestamp = datetime.utcnow().replace(microsecond=0)
+                message = f" {timestamp} Failure message sent. There was an issue when trying to load data"
+                raise ValueError(message) #Want a specific exception for this failure
+        except ValueError as err:
+            rollbar.report_message(err)
+        except Exception:
+            #Catch-all
+            rollbar.report_exc_info()
