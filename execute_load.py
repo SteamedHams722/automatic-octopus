@@ -18,16 +18,18 @@ from transmit import communicado
 # Set-up logging
 logging.basicConfig(filename='execute.log', filemode='a', level='INFO')
 
+# Create or overwrite the Spotify Oauth cache file with the cache variable data
+# Eventually, this will have to be scaled for each user.
+with open('.cache', 'w') as f:
+    f.write(os.getenv('SPOTIPY_CACHE'))
+
 def load_all():
     '''Need to have a function here so Heroku can call it. I'm currently excluding the
     response calls since it is not working correctly on raspberry pi.'''
-
     # Load the tables and send a text message if it fails
     success_dict = {'tracks': tracks_to_pg(), 'responses': responses_to_pg(os.getenv('response_sheet'))}
-
     #TODO: Add responses function call and add the results to a success dictionary
     # with the track_success data
-
     for key, val in success_dict.items():
         if val: # A True value means the job succeeded.
             #communicado(table_group=key, success=val) #This is only needed for testing.
