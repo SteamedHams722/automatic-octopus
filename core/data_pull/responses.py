@@ -38,10 +38,6 @@ def fetch_data(sheet_name):
     except Exception:
         # Catch-all
         rollbar.report_exc_info()
-    else:
-        timestamp = datetime.utcnow().replace(microsecond=0)
-        message = f"{timestamp} SUCCESS: Directory created."
-        print(message)
     # Use a try block in case the write process to the csv file fails
     try:
         with open(target_csv, 'w', newline='') as csvfile:
@@ -55,9 +51,5 @@ def fetch_data(sheet_name):
         rollbar.report_message(error)
     except Exception:
         rollbar.report_exc_info()
-    else:
-        timestamp = datetime.utcnow().replace(microsecond=0)
-        message = f"{timestamp} SUCCESS: Data written to CSV file"
-        print(message)
     
     return target_csv

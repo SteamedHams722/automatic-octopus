@@ -30,10 +30,6 @@ def get_responses(sheet_name):
     except Exception:
         #Catch-all
         rollbar.report_exc_info()
-    else:
-        timestamp = datetime.utcnow().replace(microsecond=0)
-        message = f"{timestamp} SUCCESS: Dataframe for {sheet_name} created."
-        print(message) #Just need this printed to the console
     # Replace NaN values in the dataframe with null
     response_df = response_df.replace(np.nan, 'null')
     # Convert datetime fields to string since datetime fields can't be encoded into json
@@ -63,9 +59,5 @@ def get_responses(sheet_name):
     except Exception:
         #Catch-all
         rollbar.report_exc_info()
-    else:
-        timestamp = datetime.utcnow().replace(microsecond=0)
-        message = f"{timestamp} SUCCESS: Converted response data to JSON."
-        print(message)
     
     return responses_json

@@ -2,7 +2,7 @@
 import json
 from datetime import datetime
 import rollbar
-from connections import client, oauth
+from connections import client, oauth#pylint: disable=import-error
 from spotipy.client import SpotifyException
 
 # Function to be called in other files
@@ -22,9 +22,6 @@ def recently_played():
     except Exception:
         rollbar.report_exc_info()
     else:
-        timestamp = datetime.utcnow().replace(microsecond=0)
-        message = f"{timestamp} SUCCESS: Gathered recently played data."
-        print(message)
         # Convert the dictionary to a json object
         try:
             info_json = json.dumps(results, indent=2)
@@ -34,10 +31,6 @@ def recently_played():
             rollbar.report_message(error)
         except Exception:
             rollbar.report_exc_info()
-        else:
-            timestamp = datetime.utcnow().replace(microsecond=0)
-            message = f"{timestamp} SUCCESS: Converted recently played data to JSON."
-            print(message) 
         
     return results, info_json
 
@@ -73,9 +66,6 @@ def track_features():
     except Exception:
         rollbar.report_exc_info()
     else:
-        timestamp = datetime.utcnow().replace(microsecond=0)
-        message = f"{timestamp} SUCCESS: Gathered track features data."
-        print(message) 
         # Create a json object from the dictionary
         try:
             features_json = json.dumps(features, indent=2)
@@ -85,10 +75,6 @@ def track_features():
             rollbar.report_message(error)
         except Exception:
             rollbar.report_exc_info()
-        else:
-            timestamp = datetime.utcnow().replace(microsecond=0)
-            message = f"{timestamp} SUCCESS: Converted track features data to JSON."
-            print(message) 
 
     return features_json
 
@@ -109,9 +95,6 @@ def track_artists():
     except Exception:
         rollbar.report_exc_info()
     else:
-        timestamp = datetime.utcnow().replace(microsecond=0)
-        message = f"{timestamp} SUCCESS: Gathered track artist data."
-        print(message) 
         # Create a json object from the dictionary
         try:
             artists_json = json.dumps(artists, indent=2)
@@ -121,9 +104,5 @@ def track_artists():
             rollbar.report_message(error) 
         except Exception:
             rollbar.report_exc_info()
-        else:
-            timestamp = datetime.utcnow().replace(microsecond=0)
-            message = f"{timestamp} SUCCESS: Converted track features data to JSON."
-            print(message) 
 
     return artists_json

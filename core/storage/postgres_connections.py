@@ -21,10 +21,6 @@ def pg_conn ():
     except Exception:
         #Catch-all
         rollbar.report_exc_info()
-    else:
-        timestamp = datetime.utcnow().replace(microsecond=0)
-        message = f"{timestamp} SUCCeSS: Connected to postgres."
-        print(message) #Needed for the logs.
 
 
     return conn

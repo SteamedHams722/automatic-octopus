@@ -24,9 +24,6 @@ def responses_to_pg(sheet_name):
 
     # Open the connection to the postgres db
     with pg_conn() as conn:
-        timestamp = datetime.utcnow().replace(microsecond=0)
-        message = f"{timestamp} Postgres data load initiated."
-        print(message)
         # Open up the SQL cursor so the commands can be executed
         with conn.cursor() as cursor:
             #Create the schema if it doesn't exist
@@ -41,10 +38,6 @@ def responses_to_pg(sheet_name):
                 rollbar.report_message(error)
             except Exception:
                 rollbar.report_exc_info()
-            else:
-                timestamp = datetime.utcnow().replace(microsecond=0)
-                message = f"{timestamp} SUCCESS: The {schema} schema is in the {db} database."
-                print(message)
             # Create the table if it doesn't exist
             try:
                 create_table = '''create table if not exists {0}.{1}.{2} ( 
@@ -62,10 +55,6 @@ def responses_to_pg(sheet_name):
                 rollbar.report_message(error)
             except Exception:
                 rollbar.report_exc_info()
-            else:
-                timestamp = datetime.utcnow().replace(microsecond=0)
-                message = f"{timestamp} SUCCESS: The {table} table is in the {schema} schema."
-                print(message)
           # Load the response data into postgres. The json_array_elements can be
           # used to expand them out further.
             try:
@@ -88,9 +77,6 @@ def responses_to_pg(sheet_name):
                 delete_old = "delete from {0}.{1}.{2} where created_on_utc < '{3}'".format(db, schema, table, timestamp)
                 cursor.execute(delete_old)
                 conn.commit()
-                timestamp = datetime.utcnow().replace(microsecond=0)
-                message = f"{timestamp} SUCCESS: Data was inserted into the {table} table."
                 success = True
-                print(message)
 
     return success

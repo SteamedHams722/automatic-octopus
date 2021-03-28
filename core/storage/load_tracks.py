@@ -32,9 +32,6 @@ def tracks_to_pg():
 
     # Open the postgres connection
     with pg_conn() as conn:
-        timestamp = datetime.utcnow().replace(microsecond=0)
-        message = f"{timestamp} Postgres data load initiated."
-        print(message)
 
         # Open up the SQL cursor so the commands can be executed
         with conn.cursor() as cursor:
@@ -51,10 +48,6 @@ def tracks_to_pg():
             except Exception:
                 #Catch-all
                 rollbar.report_exc_info()
-            else:
-                timestamp = datetime.utcnow().replace(microsecond=0)
-                message = f"{timestamp} SUCCESS: The {schema} schema is in the {db} database."
-                print(message)
         # Loop through each dictionary entry to insert the data. Also creates 
         # the table if it doesn't exist.
             for table, data in table_data.items():
@@ -82,9 +75,6 @@ def tracks_to_pg():
                 except Exception:
                     rollbar.report_exc_info()
                 else:
-                    timestamp = datetime.utcnow().replace(microsecond=0)
-                    message = f"{timestamp} SUCCESS: The {table} table is in the {schema} schema."
-                    print(message)
                     if table == 'track_info':
                         insert_data = '''insert into {0}.{1}.{2} (src, user_id, created_on_utc) 
                         values ('{3}','{4}','{5}');'''.format(db, schema, table, data, user_id, timestamp)
@@ -101,10 +91,5 @@ def tracks_to_pg():
                         rollbar.report_message(error)
                     except Exception:
                         rollbar.report_exc_info()
-                    else:
-                        timestamp = datetime.utcnow().replace(microsecond=0)
-                        message = f"{timestamp} SUCCESS: Data was inserted into the {table} table."
-                        success = True
-                        print(message)
                         
     return success
