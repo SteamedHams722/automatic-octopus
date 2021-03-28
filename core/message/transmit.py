@@ -22,7 +22,6 @@ def communicado(table_group, success=False):
     if success: #Is the job successful?
         timestamp = datetime.utcnow().replace(microsecond=0)
         results = f"\nSUCCESS: {timestamp} Data loaded into the {table_group} table(s).\n"
-        print(results) #want successes printed to the console
     else: # Only want to send a message if the the load failed
         timestamp = datetime.utcnow().replace(microsecond=0)
         results = f"\nERROR: {timestamp} Data failed to load into the {table_group} table(s).\n"
@@ -42,7 +41,6 @@ def communicado(table_group, success=False):
         except Exception: #Not sure of the specific exceptions here
             rollbar.report_exc_info()
         with server as server:
-            print("Opening connection to server")
             # Start the email server and login
             try:
                 server.connect(smtp, port)

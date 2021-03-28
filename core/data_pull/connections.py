@@ -20,10 +20,6 @@ def client():
         rollbar.report_message(error)
     except Exception:
         rollbar.report_exc_info()
-    else:
-        timestamp = datetime.utcnow().replace(microsecond=0)
-        message = f"{timestamp} SUCCESS: The client credentials were established."
-        print(message)
 
     return client_conn
 
@@ -41,7 +37,6 @@ def oauth(scope):
             token = token_info['access_token']
         else:
             auth_url = sp_oauth.get_authorize_url()
-            print(auth_url)
             response = input('Paste the above link into your browser, then paste the redirect url here: ')
             code = sp_oauth.parse_response_code(response)
             token_info = sp_oauth.get_access_token(code)
@@ -53,10 +48,6 @@ def oauth(scope):
         rollbar.report_message(error)
     except Exception:
         rollbar.report_exc_info()
-    else:
-        timestamp = datetime.utcnow().replace(microsecond=0)
-        message = f"{timestamp} SUCCESS: The access token exists"
-        print(message)
     # Refresh the access token if it is expired
     try:
         if sp_oauth.is_token_expired(token_info):
@@ -71,10 +62,6 @@ def oauth(scope):
         rollbar.report_message(error)
     except Exception:
         rollbar.report_exc_info()
-    else:
-        timestamp = datetime.utcnow().replace(microsecond=0)
-        message = f"{timestamp} SUCCESS: The access token was refreshed."
-        print(message)
 
     return auth_token
 
