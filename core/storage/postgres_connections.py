@@ -3,7 +3,7 @@
 from datetime import datetime
 import psycopg2
 import os
-import logging
+import rollbar
 
 def pg_conn ():
     '''Use the environment variables to establish a connection to the postgres
@@ -17,6 +17,14 @@ def pg_conn ():
     except (psycopg2.DatabaseError) as err:
         timestamp = datetime.utcnow().replace(microsecond=0)
         error = f"{timestamp} ERROR: There was an issue connecting to postgres. Message: {err}"
-        logging.exception(error)
+        rollbar.report_message(error)
+    except Exception:
+        #Catch-all
+        rollbar.report_exc_info()
+    else:
+        timestamp = datetime.utcnow().replace(microsecond=0)
+        message = f"{timestamp} SUCCeSS: Connected to postgres."
+        print(message) #Needed for the logs.
+
 
     return conn
