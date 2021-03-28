@@ -6,16 +6,13 @@ database'''
 # Import libraries
 import sys
 import os
-import logging
+import rollbar
 from datetime import datetime
 user_home = os.path.expanduser("~")
 sys.path.append(os.path.join(user_home, 'core', 'data_pull'))
 from tracks import track_features, recently_played #pylint: disable=import-error
 from postgres_connections import pg_conn#pylint: disable=import-error
 from psycopg2 import ProgrammingError, errors
-
-# Set-up logging
-logging.basicConfig(filename='execute.log', filemode='a', level='INFO')
 
 # Establish basic Postgeres variables that will be used in both functions
 db = os.getenv('POSTGRES_DB')
@@ -35,9 +32,6 @@ def tracks_to_pg():
 
     # Open the postgres connection
     with pg_conn() as conn:
-        timestamp = datetime.utcnow().replace(microsecond=0)
-        message = f"{timestamp} Postgres data load initiated."
-        logging.info(message)
 
         # Open up the SQL cursor so the commands can be executed
         with conn.cursor() as cursor:
@@ -50,12 +44,10 @@ def tracks_to_pg():
                 timestamp = datetime.utcnow().replace(microsecond=0)
                 error = f"{timestamp} ERROR: There was an issue creating the {schema} schema. Message: {err}"
                 success = False #This will be used to determine what text message to send
-                logging.exception(error)
-            else:
-                timestamp = datetime.utcnow().replace(microsecond=0)
-                message = f"{timestamp} SUCCESS: The {schema} schema is in the {db} database."
-                logging.info(message)
-
+                rollbar.report_message(error)
+            except Exception:
+                #Catch-all
+                rollbar.report_exc_info()
         # Loop through each dictionary entry to insert the data. Also creates 
         # the table if it doesn't exist.
             for table, data in table_data.items():
@@ -79,11 +71,11 @@ def tracks_to_pg():
                     timestamp = datetime.utcnow().replace(microsecond=0)
                     error = f"{timestamp} ERROR: There was an issue creating the {table} table. Message: {err}"
                     success = False
-                    logging.exception(error)
+                    rollbar.report_message(error)
+                except Exception:
+                    rollbar.report_exc_info()
                 else:
                     timestamp = datetime.utcnow().replace(microsecond=0)
-                    message = f"{timestamp} SUCCESS: The {table} table is in the {schema} schema."
-                    logging.info(message)
                     if table == 'track_info':
                         insert_data = '''insert into {0}.{1}.{2} (src, user_id, created_on_utc) 
                         values ('{3}','{4}','{5}');'''.format(db, schema, table, data, user_id, timestamp)
@@ -97,11 +89,10 @@ def tracks_to_pg():
                         timestamp = datetime.utcnow().replace(microsecond=0)
                         error = f"{timestamp} ERROR:Unable to insert data into the {table} table. Message: {err}"
                         success = False  #This will be used for the text message
-                        logging.exception(error)
+                        rollbar.report_message(error)
+                    except Exception:
+                        rollbar.report_exc_info()
                     else:
-                        timestamp = datetime.utcnow().replace(microsecond=0)
-                        message = f"{timestamp} SUCCESS: Data was inserted into the {table} table."
                         success = True
-                        logging.info(message)
-
+                        
     return success
