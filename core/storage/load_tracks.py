@@ -92,5 +92,7 @@ def tracks_to_pg():
                         rollbar.report_message(error)
                     except Exception:
                         rollbar.report_exc_info()
+                    else:
+                        success = True
                         
     return success
