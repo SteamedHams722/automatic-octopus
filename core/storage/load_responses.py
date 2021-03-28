@@ -57,26 +57,27 @@ def responses_to_pg(sheet_name):
                 rollbar.report_exc_info()
           # Load the response data into postgres. The json_array_elements can be
           # used to expand them out further.
-            try:
-                timestamp = datetime.utcnow().replace(microsecond=0)
-                insert_data = '''insert into {0}.{1}.{2} (user_id, src, created_on_utc) 
-                values ('{3}','{4}', '{5}');'''.format(db, schema, table, user_id, responses_data, timestamp)
-                cursor.execute(insert_data)
-                conn.commit()
-            except (ProgrammingError, errors.InFailedSqlTransaction, errors.SyntaxError) as err:
-                timestamp = datetime.utcnow().replace(microsecond=0)
-                error = f"{timestamp} ERROR:Unable to insert data into the {table} table. Message: {err}"
-                success = False #This will be used for the text message
-                rollbar.report_message(error)
-            except Exception:
-                rollbar.report_exc_info()
             else:
+                try:
+                    timestamp = datetime.utcnow().replace(microsecond=0)
+                    insert_data = '''insert into {0}.{1}.{2} (user_id, src, created_on_utc) 
+                    values ('{3}','{4}', '{5}');'''.format(db, schema, table, user_id, responses_data, timestamp)
+                    cursor.execute(insert_data)
+                    conn.commit()
+                except (ProgrammingError, errors.InFailedSqlTransaction, errors.SyntaxError) as err:
+                    timestamp = datetime.utcnow().replace(microsecond=0)
+                    error = f"{timestamp} ERROR:Unable to insert data into the {table} table. Message: {err}"
+                    success = False #This will be used for the text message
+                    rollbar.report_message(error)
+                except Exception:
+                    rollbar.report_exc_info()
+                else:
                 #Delete the old data since it's not necessary anymore. Doing this separately
                 # from the table create because if the data fails to load I don't want to lose
                 # the previous data
-                delete_old = "delete from {0}.{1}.{2} where created_on_utc < '{3}'".format(db, schema, table, timestamp)
-                cursor.execute(delete_old)
-                conn.commit()
-                success = True
+                    delete_old = "delete from {0}.{1}.{2} where created_on_utc < '{3}'".format(db, schema, table, timestamp)
+                    cursor.execute(delete_old)
+                    conn.commit()
+                    success = True
 
     return success
