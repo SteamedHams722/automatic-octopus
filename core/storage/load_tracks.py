@@ -75,6 +75,7 @@ def tracks_to_pg():
                 except Exception:
                     rollbar.report_exc_info()
                 else:
+                    timestamp = datetime.utcnow().replace(microsecond=0)
                     if table == 'track_info':
                         insert_data = '''insert into {0}.{1}.{2} (src, user_id, created_on_utc) 
                         values ('{3}','{4}','{5}');'''.format(db, schema, table, data, user_id, timestamp)
