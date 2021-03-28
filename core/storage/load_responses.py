@@ -3,16 +3,13 @@
 #Import libraries
 import sys
 import os
-import logging
+import rollbar
 from datetime import datetime
 user_home = os.path.expanduser("~")
 sys.path.append(os.path.join(user_home, 'core', 'data_prep'))
 from responses_prep import get_responses#pylint: disable=import-error
 from postgres_connections import pg_conn#pylint: disable=import-error
 from psycopg2 import ProgrammingError, errors
-
-# Set-up logging
-logging.basicConfig(filename='execute.log', filemode='a', level='INFO')
 
 def responses_to_pg(sheet_name):
     '''This function loads the json responses data into postgres'''
@@ -29,8 +26,7 @@ def responses_to_pg(sheet_name):
     with pg_conn() as conn:
         timestamp = datetime.utcnow().replace(microsecond=0)
         message = f"{timestamp} Postgres data load initiated."
-        logging.info(message)
-
+        print(message)
         # Open up the SQL cursor so the commands can be executed
         with conn.cursor() as cursor:
             #Create the schema if it doesn't exist
@@ -42,12 +38,13 @@ def responses_to_pg(sheet_name):
                 timestamp = datetime.utcnow().replace(microsecond=0)
                 error = f"{timestamp} ERROR: There was an issue creating the {schema} schema. Message: {err}"
                 success = False #This will be used to determine what text message to send
-                logging.exception(error)
+                rollbar.report_message(error)
+            except Exception:
+                rollbar.report_exc_info()
             else:
                 timestamp = datetime.utcnow().replace(microsecond=0)
                 message = f"{timestamp} SUCCESS: The {schema} schema is in the {db} database."
-                logging.info(message)
-
+                print(message)
             # Create the table if it doesn't exist
             try:
                 create_table = '''create table if not exists {0}.{1}.{2} ( 
@@ -62,12 +59,13 @@ def responses_to_pg(sheet_name):
                 timestamp = datetime.utcnow().replace(microsecond=0)
                 error = f"{timestamp} ERROR: There was an issue creating the {table} table. Message: {err}"
                 success = False
-                logging.exception(error)
+                rollbar.report_message(error)
+            except Exception:
+                rollbar.report_exc_info()
             else:
                 timestamp = datetime.utcnow().replace(microsecond=0)
                 message = f"{timestamp} SUCCESS: The {table} table is in the {schema} schema."
-                logging.info(message)
-
+                print(message)
           # Load the response data into postgres. The json_array_elements can be
           # used to expand them out further.
             try:
@@ -80,7 +78,9 @@ def responses_to_pg(sheet_name):
                 timestamp = datetime.utcnow().replace(microsecond=0)
                 error = f"{timestamp} ERROR:Unable to insert data into the {table} table. Message: {err}"
                 success = False #This will be used for the text message
-                logging.exception(error)
+                rollbar.report_message(error)
+            except Exception:
+                rollbar.report_exc_info()
             else:
                 #Delete the old data since it's not necessary anymore. Doing this separately
                 # from the table create because if the data fails to load I don't want to lose
@@ -91,6 +91,6 @@ def responses_to_pg(sheet_name):
                 timestamp = datetime.utcnow().replace(microsecond=0)
                 message = f"{timestamp} SUCCESS: Data was inserted into the {table} table."
                 success = True
-                logging.info(message)
+                print(message)
 
     return success
