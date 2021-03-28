@@ -7,15 +7,12 @@ import os
 import sys
 import numpy as np
 from datetime import datetime, timezone
-import logging
+import rollbar
 import json
 import pandas as pd # Used fo data framing
 user_home = os.path.expanduser("~")
 sys.path.append(os.path.join(user_home, 'core', 'data_pull'))
 from responses import fetch_data#pylint: disable=import-error
-
-# Set-up logging
-logging.basicConfig(filename='execute.log', filemode='a', level='INFO')
 
 #Function to read csv file based on user input..
 def get_responses(sheet_name):
@@ -23,22 +20,22 @@ def get_responses(sheet_name):
 
     #Read the specified file
     file_path = fetch_data(sheet_name)
-
     #Create a pandas dataframe from the csv file and sheet
     try:
         response_df = pd.read_csv(file_path)
     except (IndexError, FileNotFoundError, NameError, ValueError) as err:
         timestamp = datetime.utcnow().replace(microsecond=0)
         error = f"{timestamp} ERROR: Dataframe for {sheet_name} not created. Message: {err}"
-        logging.exception(error)
+        rollbar.report_message(error)
+    except Exception:
+        #Catch-all
+        rollbar.report_exc_info()
     else:
         timestamp = datetime.utcnow().replace(microsecond=0)
         message = f"{timestamp} SUCCESS: Dataframe for {sheet_name} created."
-        logging.info(message)
-    
+        print(message) #Just need this printed to the console
     # Replace NaN values in the dataframe with null
     response_df = response_df.replace(np.nan, 'null')
-    
     # Convert datetime fields to string since datetime fields can't be encoded into json
     # If the fields are NaT, convert the value to null
     for col in response_df.select_dtypes([np.datetime64]):
@@ -46,30 +43,29 @@ def get_responses(sheet_name):
             response_df[col] = 'null'
         else:
             response_df[col] = response_df[col].astype(str)
-    
     #Create a basic list of the dictionaries from the dataframe
     response_dict = response_df.to_dict(orient='records')
-
     #Create metadata variables to add to each dictionary in the json_list
     metadata_file = f"{sheet_name}.csv"
     metadata_now = datetime.now(tz=timezone.utc) #Need to store the current datetime in UTC time
     metadata_timestamp = metadata_now.strftime('%Y-%m-%d %H:%M:%S')
     metadata_dict = {'metadata_timestamp': metadata_timestamp, 'metadata_file': metadata_file}
-    
     #Add the metadata fields to each nested dictionary in the json_list
     for response in response_dict:
         response.update(metadata_dict)
-
     # Create the json output that will be loaded into postgres
     try:
         responses_json = json.dumps(response_dict, indent=2)
     except ValueError as err:
         timestamp = datetime.utcnow().replace(microsecond=0)
         error = f"{timestamp} ERROR: Issue converting response data to JSON. Message: {err}"
-        logging.exception(error) 
+        rollbar.report_message(err)
+    except Exception:
+        #Catch-all
+        rollbar.report_exc_info()
     else:
         timestamp = datetime.utcnow().replace(microsecond=0)
         message = f"{timestamp} SUCCESS: Converted response data to JSON."
-        logging.info(message)
+        print(message)
     
     return responses_json
