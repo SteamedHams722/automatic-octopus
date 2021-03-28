@@ -57,7 +57,6 @@ def oauth(scope):
         timestamp = datetime.utcnow().replace(microsecond=0)
         message = f"{timestamp} SUCCESS: The access token exists"
         print(message)
-
     # Refresh the access token if it is expired
     try:
         if sp_oauth.is_token_expired(token_info):
