@@ -1,12 +1,9 @@
 # Import necessary libraries
-import logging
 import json
 from datetime import datetime
+import rollbar
 from connections import client, oauth
 from spotipy.client import SpotifyException
-
-# Set-up logging
-logging.basicConfig(filename='execute.log', filemode='a', level='INFO')
 
 # Function to be called in other files
 def recently_played():
@@ -21,40 +18,41 @@ def recently_played():
     except SpotifyException as err:
         timestamp = datetime.utcnow().replace(microsecond=0)
         error = f"{timestamp} ERROR: Issue gathering recently played data. Message: {err}"
-        logging.exception(error) 
+        rollbar.report_message(error)
+    except Exception:
+        rollbar.report_exc_info()
     else:
         timestamp = datetime.utcnow().replace(microsecond=0)
         message = f"{timestamp} SUCCESS: Gathered recently played data."
-        logging.info(message)
-
+        print(message)
         # Convert the dictionary to a json object
         try:
             info_json = json.dumps(results, indent=2)
         except ValueError as err:
             timestamp = datetime.utcnow().replace(microsecond=0)
             error = f"{timestamp} ERROR: Issue converting recently played data to JSON. Message: {err}"
-            logging.exception(error) 
+            rollbar.report_message(error)
+        except Exception:
+            rollbar.report_exc_info()
         else:
             timestamp = datetime.utcnow().replace(microsecond=0)
             message = f"{timestamp} SUCCESS: Converted recently played data to JSON."
-            logging.info(message) 
+            print(message) 
         
     return results, info_json
 
 def get_ids():
     '''Gets the track and artist IDs for the recently played tracks'''
-    results, _ = recently_played()
 
-    #Loop through each dictionary in the items list to get the track IDs
+    results, _ = recently_played()
+    # Loop through each dictionary in the items list to get the track IDs
     tracks = []
     for item in results['items']:
         tracks.append(item['track']['id'])
-        
     artists = []
     for item in results['items']:
         for artist in item['track']['artists']:
             artists.append(artist['id'])
-    
     # De-duplicate the IDs in the list. This prevents downstream functions from
     # hitting the 100 ID limit
     tracks = list(dict.fromkeys(tracks))
@@ -64,63 +62,68 @@ def get_ids():
 def track_features():
     '''Return high level features on each recently played track'''
     tracks, _ = get_ids()
-
-    #Pull the SPI into a dictionary
+    # Pull the API into a dictionary
     try:
         client_scope = client()
         features = client_scope.audio_features(tracks)
     except SpotifyException as err:
         timestamp = datetime.utcnow().replace(microsecond=0)
         error = f"{timestamp} ERROR: Issue gathering track features data. Message: {err}"
-        logging.exception(error) 
+        rollbar.report_message(error)
+    except Exception:
+        rollbar.report_exc_info()
     else:
         timestamp = datetime.utcnow().replace(microsecond=0)
         message = f"{timestamp} SUCCESS: Gathered track features data."
-        logging.info(message) 
-
-        #Create a json object from the dictionary
+        print(message) 
+        # Create a json object from the dictionary
         try:
             features_json = json.dumps(features, indent=2)
         except ValueError as err:
             timestamp = datetime.utcnow().replace(microsecond=0)
             error = f"{timestamp} ERROR: Issue converting track features data to JSON. Message: {err}"
-            logging.exception(error) 
+            rollbar.report_message(error)
+        except Exception:
+            rollbar.report_exc_info()
         else:
             timestamp = datetime.utcnow().replace(microsecond=0)
             message = f"{timestamp} SUCCESS: Converted track features data to JSON."
-            logging.info(message) 
+            print(message) 
 
     return features_json
 
 def track_artists():
     '''Bring in the artist-related data tied to the recently played tracks'''
-    _, artist_ids = get_ids()
 
-    #Have to limit the number of artists used since there are API limits
+    _, artist_ids = get_ids()
+    # Have to limit the number of artists used since there are API limits
     top_artists = artist_ids[:50]
-    #Pull the SPI into a dictionary
+    # Pull the SPI into a dictionary
     try:
         client_scope = client()
         artists = client_scope.artists(top_artists)
     except SpotifyException as err:
         timestamp = datetime.utcnow().replace(microsecond=0)
         error = f"{timestamp} ERROR: Issue gathering track artist data. Message: {err}"
-        logging.exception(error) 
+        rollbar.report_message(error)
+    except Exception:
+        rollbar.report_exc_info()
     else:
         timestamp = datetime.utcnow().replace(microsecond=0)
         message = f"{timestamp} SUCCESS: Gathered track artist data."
-        logging.info(message) 
-
-        #Create a json object from the dictionary
+        print(message) 
+        # Create a json object from the dictionary
         try:
             artists_json = json.dumps(artists, indent=2)
         except ValueError as err:
             timestamp = datetime.utcnow().replace(microsecond=0)
             error = f"{timestamp} ERROR: Issue converting track artist data to JSON. Message: {err}"
-            logging.exception(error) 
+            rollbar.report_message(error) 
+        except Exception:
+            rollbar.report_exc_info()
         else:
             timestamp = datetime.utcnow().replace(microsecond=0)
             message = f"{timestamp} SUCCESS: Converted track features data to JSON."
-            logging.info(message) 
+            print(message) 
 
     return artists_json
