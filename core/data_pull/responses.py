@@ -34,6 +34,7 @@ def fetch_data(sheet_name):
     except OSError as err:
         timestamp = datetime.utcnow().replace(microsecond=0)
         error = f" {timestamp} ERROR: There was an issue creating the directory. Message: {err}"
+        rollbar.report_message(error)
     except Exception:
         # Catch-all
         rollbar.report_exc_info()
