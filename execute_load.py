@@ -28,8 +28,6 @@ def load_all():
     response calls since it is not working correctly on raspberry pi.'''
     # Load the tables and send a text message if it fails
     success_dict = {'tracks': tracks_to_pg(), 'responses': responses_to_pg(os.getenv('response_sheet'))}
-    #TODO: Add responses function call and add the results to a success dictionary
-    # with the track_success data
     for key, val in success_dict.items():
         try:
             if val: # A True value means the job succeeded.
