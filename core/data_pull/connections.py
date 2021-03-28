@@ -3,27 +3,27 @@
 
 # Import necessary libraries
 from datetime import datetime
-import logging
+import rollbar
 from urllib3.exceptions import NewConnectionError, MaxRetryError, ConnectTimeoutError
 import spotipy
 from spotipy.oauth2 import SpotifyOAuth, SpotifyClientCredentials, SpotifyOauthError
 
-# Set-up logging
-logging.basicConfig(filename='execute.log', filemode='a', level='INFO')
-
 #Set up client credentials needed for basic info
 def client():
     '''Return the client credentials needed to access non-user data'''
+
     try:
         client_conn = spotipy.Spotify(auth_manager=SpotifyClientCredentials())
     except (NewConnectionError, MaxRetryError, ConnectTimeoutError) as err:
         timestamp = datetime.utcnow().replace(microsecond=0)
         error = f" {timestamp} ERROR: There was an issue establishing the client credentials. Message: {err}"
-        logging.exception(error)
+        rollbar.report_message(error)
+    except Exception:
+        rollbar.report_exc_info()
     else:
         timestamp = datetime.utcnow().replace(microsecond=0)
         message = f"{timestamp} SUCCESS: The client credentials were established."
-        logging.info(message)
+        print(message)
 
     return client_conn
 
@@ -31,9 +31,9 @@ def client():
 def oauth(scope):
     '''Return the OAuth information needed to access user data and refresh the
     token as needed.'''
+
     #Get the base authentication connection
     sp_oauth = SpotifyOAuth(scope=scope)
-
     #Set-up a token refresh so users don't have to log in constantly
     token_info = sp_oauth.get_cached_token() 
     try:
@@ -50,11 +50,13 @@ def oauth(scope):
     except (MaxRetryError, NewConnectionError, ConnectTimeoutError, SpotifyOauthError) as err:
         timestamp = datetime.utcnow().replace(microsecond=0)
         error = f" {timestamp} ERROR: There was an issue acquiring the access token. Message: {err}"
-        logging.exception(error)
+        rollbar.report_message(error)
+    except Exception:
+        rollbar.report_exc_info()
     else:
         timestamp = datetime.utcnow().replace(microsecond=0)
         message = f"{timestamp} SUCCESS: The access token exists"
-        logging.info(message)
+        print(message)
 
     # Refresh the access token if it is expired
     try:
@@ -67,11 +69,13 @@ def oauth(scope):
     except (MaxRetryError, NewConnectionError, ConnectTimeoutError, SpotifyOauthError) as err:
         timestamp = datetime.utcnow().replace(microsecond=0)
         error = f" {timestamp} ERROR: There was an issue refreshing the access token. Message: {err}"
-        logging.exception(error)
+        rollbar.report_message(error)
+    except Exception:
+        rollbar.report_exc_info()
     else:
         timestamp = datetime.utcnow().replace(microsecond=0)
         message = f"{timestamp} SUCCESS: The access token was refreshed."
-        logging.info(message)
+        print(message)
 
     return auth_token
 
