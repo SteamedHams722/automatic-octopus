@@ -43,7 +43,7 @@ def responses_to_pg(sheet_name):
                 create_table = '''create table if not exists {0}.{1}.{2} ( 
                 id serial not null primary key,
                 user_id varchar(32) not null,
-                src json not null,
+                src jsonb not null,
                 created_on_utc timestamp not null
                 );'''.format(db, schema, table)
                 cursor.execute(create_table)
