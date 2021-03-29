@@ -55,13 +55,13 @@ def tracks_to_pg():
                     create_table = '''create table if not exists {0}.{1}.{2} ( 
                     id serial not null primary key,
                     user_id varchar(32),
-                    src json not null,
+                    src jsonb not null,
                     created_on_utc timestamp not null
                     );'''.format(db, schema, table)
                 else:
                     create_table = '''create table if not exists {0}.{1}.{2} ( 
                     id serial not null primary key,
-                    src json not null,
+                    src jsonb not null,
                     created_on_utc timestamp not null
                     );'''.format(db, schema, table)
                 try:
@@ -93,6 +93,34 @@ def tracks_to_pg():
                     except Exception:
                         rollbar.report_exc_info()
                     else:
-                        success = True
+                        # Delete duplicate records that are pulled in
+                        try:
+                            delete_dupes = f'''
+                            with unique_only as (
+                                select
+                                    src::text as src_text,
+                                    max(id) as max_id
+                                from {schema}.{table}
+                                group by 1
+                            )
+                            delete from {schema}.{table} feat
+                            where not exists (
+                            select 1 
+                            from unique_only unq 
+                            where 
+                                unq.src_text = feat.src::text 
+                                and unq.max_id = feat.id
+                            )'''
+                            cursor.execute(delete_dupes)
+                            conn.commit()
+                        except (ProgrammingError, errors.InFailedSqlTransaction, errors.SyntaxError) as err:
+                            timestamp = datetime.utcnow().replace(microsecond=0)
+                            error = f"{timestamp} ERROR:Unable to delete duplicates from the {table} table. Message: {err}"
+                            success = False
+                            rollbar.report_message(error)
+                        except Exception:
+                            rollbar.report_exc_info()
+                        else:
+                            success = True
                         
     return success
