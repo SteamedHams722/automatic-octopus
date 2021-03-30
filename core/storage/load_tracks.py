@@ -4,13 +4,9 @@
 database"""
 
 # Import libraries
-import sys
 import os
 import rollbar
 from datetime import datetime
-
-user_home = os.path.expanduser("~")
-sys.path.append(os.path.join(user_home, "core", "data_pull"))
 from tracks import track_features, recently_played  # pylint: disable=import-error
 from postgres_connections import pg_conn  # pylint: disable=import-error
 from psycopg2 import ProgrammingError, errors

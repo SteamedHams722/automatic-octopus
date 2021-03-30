@@ -31,8 +31,7 @@ def fetch_data(sheet_name):
     )  # This returns all the column names from the Google Sheet
     # Create a local CSV file that will hold the data so it can used for data analytics
     # Also, create a local folder to store them if it doesn't exist.
-    user_home = os.path.expanduser("~")
-    data_dir = os.path.join(user_home, "automatic-octopus", "data")
+    data_dir = os.path.join(os.path.expanduser("~"), "automatic-octopus", "data")
     try:
         if not os.path.exists(data_dir):
             os.makedirs(data_dir)
