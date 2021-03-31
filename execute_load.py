@@ -53,3 +53,12 @@ def load_all():
         except Exception:
             # Catch-all
             rollbar.report_exc_info()
+
+
+def main():
+    """Main executable for the code"""
+    load_all()
+
+
+if __name__ == "__main__":
+    main()
