@@ -11,11 +11,11 @@ import rollbar
 
 # Add folders to path that will be called in other functions. This should be replaced by
 # using packages.
-user_home = os.path.expanduser("~")
-sys.path.append(os.path.join(user_home, "core", "storage"))
-sys.path.append(os.path.join(user_home, "core", "message"))
-sys.path.append(os.path.join(user_home, "core", "data_prep"))
-sys.path.append(os.path.join(user_home, "core", "data_pull"))
+home_dir = os.path.expanduser("~")
+sys.path.append(os.path.join(home_dir, "core", "storage"))
+sys.path.append(os.path.join(home_dir, "core", "message"))
+sys.path.append(os.path.join(home_dir, "core", "data_prep"))
+sys.path.append(os.path.join(home_dir, "core", "data_pull"))
 from load_tracks import tracks_to_pg
 from load_responses import responses_to_pg
 from transmit import communicado
