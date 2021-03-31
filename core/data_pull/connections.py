@@ -37,7 +37,7 @@ def oauth(scope):
         if token_info:
             token = token_info["access_token"]
         else:
-            auth_url = sp_oauth.get_authorize_url()
+            sp_oauth.get_authorize_url()
             response = input(
                 "Paste the above link into your browser, then paste the redirect url here: "
             )
