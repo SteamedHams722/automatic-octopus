@@ -9,7 +9,7 @@ import rollbar
 from datetime import datetime
 from tracks import track_features, recently_played  # pylint: disable=import-error
 from postgres_connections import pg_conn  # pylint: disable=import-error
-from psycopg2 import ProgrammingError, errors
+import psycopg2
 
 # Establish basic Postgeres variables that will be used in both functions
 db = os.getenv("POSTGRES_DB")
@@ -41,15 +41,12 @@ def tracks_to_pg():
                 cursor.execute(create_schema)
                 conn.commit()
             except (
-                ProgrammingError,
-                errors.InFailedSqlTransaction,
-                errors.SyntaxError,
+                psycopg2.ProgrammingError,
+                psycopg2.errors.InFailedSqlTransaction,
+                psycopg2.errors.SyntaxError
             ) as err:
                 timestamp = datetime.utcnow().replace(microsecond=0)
                 error = f"{timestamp} ERROR: There was an issue creating the {schema} schema. Message: {err}"
-                success = (
-                    False  # This will be used to determine what text message to send
-                )
                 rollbar.report_message(error)
             except Exception:
                 # Catch-all
@@ -78,13 +75,12 @@ def tracks_to_pg():
                     cursor.execute(create_table)
                     conn.commit()
                 except (
-                    ProgrammingError,
-                    errors.InFailedSqlTransaction,
-                    errors.SyntaxError,
+                    psycopg2.ProgrammingError,
+                    psycopg2.errors.InFailedSqlTransaction,
+                    psycopg2.errors.SyntaxError
                 ) as err:
                     timestamp = datetime.utcnow().replace(microsecond=0)
                     error = f"{timestamp} ERROR: There was an issue creating the {table} table. Message: {err}"
-                    success = False
                     rollbar.report_message(error)
                 except Exception:
                     rollbar.report_exc_info()
@@ -104,13 +100,12 @@ def tracks_to_pg():
                         cursor.execute(insert_data)
                         conn.commit()
                     except (
-                        ProgrammingError,
-                        errors.InFailedSqlTransaction,
-                        errors.SyntaxError,
+                        psycopg2.ProgrammingError,
+                        psycopg2.errors.InFailedSqlTransaction,
+                        psycopg2.errors.SyntaxError
                     ) as err:
                         timestamp = datetime.utcnow().replace(microsecond=0)
                         error = f"{timestamp} ERROR:Unable to insert data into the {table} table. Message: {err}"
-                        success = False  # This will be used for the text message
                         rollbar.report_message(error)
                     except Exception:
                         rollbar.report_exc_info()
@@ -142,11 +137,6 @@ def tracks_to_pg():
                         ) as err:
                             timestamp = datetime.utcnow().replace(microsecond=0)
                             error = f"{timestamp} ERROR:Unable to delete duplicates from the {table} table. Message: {err}"
-                            success = False
                             rollbar.report_message(error)
                         except Exception:
                             rollbar.report_exc_info()
-                        else:
-                            success = True
-
-    return success

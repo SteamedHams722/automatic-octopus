@@ -38,9 +38,6 @@ def responses_to_pg(sheet_name):
             ) as err:
                 timestamp = datetime.utcnow().replace(microsecond=0)
                 error = f"{timestamp} ERROR: There was an issue creating the {schema} schema. Message: {err}"
-                success = (
-                    False  # This will be used to determine what text message to send
-                )
                 rollbar.report_message(error)
             except Exception:
                 rollbar.report_exc_info()
@@ -63,7 +60,6 @@ def responses_to_pg(sheet_name):
             ) as err:
                 timestamp = datetime.utcnow().replace(microsecond=0)
                 error = f"{timestamp} ERROR: There was an issue creating the {table} table. Message: {err}"
-                success = False
                 rollbar.report_message(error)
             except Exception:
                 rollbar.report_exc_info()
@@ -85,7 +81,6 @@ def responses_to_pg(sheet_name):
                 ) as err:
                     timestamp = datetime.utcnow().replace(microsecond=0)
                     error = f"{timestamp} ERROR:Unable to insert data into the {table} table. Message: {err}"
-                    success = False  # This will be used for the text message
                     rollbar.report_message(error)
                 except Exception:
                     rollbar.report_exc_info()
@@ -100,6 +95,3 @@ def responses_to_pg(sheet_name):
                     )
                     cursor.execute(delete_old)
                     conn.commit()
-                    success = True
-
-    return success
